@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.RobotMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.Robot">
+        <id column="id" property="id"/>
+        <result column="robot_code" property="robotCode"/>
+        <result column="robot_name" property="robotName"/>
+        <result column="model" property="model"/>
+        <result column="status" property="status"/>
+        <result column="location" property="location"/>
+        <result column="last_inspection_at" property="lastInspectionAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, robot_code, robot_name, model, status, location, last_inspection_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByRobotCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot
+        WHERE robot_code = #{robotCode}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot
+        <where>
+            <if test="robotCode != null and robotCode != ''">
+                AND robot_code LIKE '%' || #{robotCode} || '%'
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1)
+        FROM robot
+        <where>
+            <if test="robotCode != null and robotCode != ''">
+                AND robot_code LIKE '%' || #{robotCode} || '%'
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO robot (robot_code, robot_name, model, status, location, last_inspection_at)
+        VALUES (#{robotCode}, #{robotName}, #{model}, #{status}, #{location}, #{lastInspectionAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE robot
+        <set>
+            <if test="robotName != null">robot_name = #{robotName},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="lastInspectionAt != null">last_inspection_at = #{lastInspectionAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM robot WHERE id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.SysUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.SysUser">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="password_hash" property="passwordHash"/>
+        <result column="status" property="status"/>
+        <result column="last_login_at" property="lastLoginAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="WithRolesResultMap" type="com.zioneer.robotqcsystem.domain.entity.SysUser" extends="BaseResultMap">
+        <collection property="roles" ofType="string">
+            <result column="role_code"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, code, name, phone, email, password_hash, status, last_login_at, created_at, updated_at
+    </sql>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sys_user WHERE code = #{code}
+    </select>
+
+    <select id="selectByCodeWithRoles" resultMap="WithRolesResultMap">
+        SELECT u.id, u.code, u.name, u.phone, u.email, u.password_hash, u.status, u.last_login_at,
+               u.created_at, u.updated_at, ur.role_code
+        FROM sys_user u
+        LEFT JOIN sys_user_role ur ON u.code = ur.user_code
+        WHERE u.code = #{code}
+    </select>
+
+    <select id="selectList" resultMap="WithRolesResultMap">
+        SELECT u.id, u.code, u.name, u.phone, u.email, u.password_hash, u.status, u.last_login_at,
+               u.created_at, u.updated_at, ur.role_code
+        FROM (
+            SELECT <include refid="Base_Column_List"/> FROM sys_user
+            <where>
+                <if test="keyword != null and keyword != ''">
+                    AND (code LIKE '%' || #{keyword} || '%' OR name LIKE '%' || #{keyword} || '%'
+                    OR phone LIKE '%' || #{keyword} || '%' OR email LIKE '%' || #{keyword} || '%')
+                </if>
+                <if test="status != null and status != ''">
+                    AND status = #{status}
+                </if>
+                <if test="role != null and role != ''">
+                    AND EXISTS (SELECT 1 FROM sys_user_role ur2 WHERE ur2.user_code = sys_user.code AND ur2.role_code = #{role})
+                </if>
+            </where>
+            ORDER BY id DESC
+            LIMIT #{limit} OFFSET #{offset}
+        ) u
+        LEFT JOIN sys_user_role ur ON u.code = ur.user_code
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(DISTINCT u.id)
+        FROM sys_user u
+        <if test="role != null and role != ''">
+            INNER JOIN sys_user_role ur ON u.code = ur.user_code AND ur.role_code = #{role}
+        </if>
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (u.code LIKE '%' || #{keyword} || '%' OR u.name LIKE '%' || #{keyword} || '%'
+                OR u.phone LIKE '%' || #{keyword} || '%' OR u.email LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND u.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_user (code, name, phone, email, password_hash, status, created_at, updated_at)
+        VALUES (#{code}, #{name}, #{phone}, #{email}, #{passwordHash}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateByCode">
+        UPDATE sys_user
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE code = #{code}
+    </update>
+
+    <update id="updateLastLoginAt">
+        UPDATE sys_user SET last_login_at = #{lastLoginAt} WHERE code = #{code}
+    </update>
+
+    <update id="updatePasswordHash">
+        UPDATE sys_user SET password_hash = #{passwordHash}, updated_at = #{updatedAt} WHERE code = #{code}
+    </update>
+
+    <delete id="deleteByCode">
+        DELETE FROM sys_user WHERE code = #{code}
+    </delete>
+
+    <delete id="deleteUserRoles">
+        DELETE FROM sys_user_role WHERE user_code = #{userCode}
+    </delete>
+
+    <insert id="insertUserRole">
+        INSERT INTO sys_user_role (user_code, role_code) VALUES (#{userCode}, #{roleCode})
+    </insert>
+</mapper>
