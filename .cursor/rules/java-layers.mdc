@@ -1,0 +1,28 @@
+---
+description: Controller / Service / Repository 分层与 DTO-VO-Entity 分离
+globs: **/*Controller.java,**/*Service*.java,**/mapper/**/*.java,**/domain/**/*.java
+alwaysApply: false
+---
+
+# 分层与对象规范
+
+## Controller
+- 只做三件事：接收请求、参数校验、返回结果。**禁止写业务逻辑**。
+- 入参使用 DTO + `@Valid`，返回统一 `Result<T>`。
+- 示例：`return Result.ok(taskService.createTask(dto));`
+
+## Service
+- 负责业务逻辑、数据组合、调用 Mapper/Repository。
+- 接口与实现分离：XxxService 接口 + XxxServiceImpl 实现。
+- 事务注解加在实现类方法上：`@Transactional(rollbackFor = Exception.class)`。
+- 流程：校验(validate) → 转换(convert) → 持久化 → 返回。
+
+## Repository / Mapper
+- 只负责数据库操作，**禁止写业务逻辑**。
+- MyBatis：Mapper 接口 + XML，方法名与 SQL 语义一致。
+
+## DTO / VO / Entity 分离
+- **DTO**：请求入参，带校验注解（@NotBlank、@NotNull 等）。
+- **VO**：返回给前端的视图对象，只暴露必要字段。
+- **Entity**：与表结构对应的实体，用于持久化。
+- 三者必须分离，禁止用 Entity 直接做请求/响应体。

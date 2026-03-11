@@ -1,0 +1,18 @@
+---
+description: 异常处理与日志规范
+globs: **/*.java
+alwaysApply: false
+---
+
+# 异常与日志
+
+## 异常
+- 业务异常使用自定义 `BusinessException`，由 `@RestControllerAdvice` 统一处理。
+- 全局异常处理器返回统一结构（如 `Result.fail(code, message)`），不直接堆栈外抛。
+- 捕获后需记录日志或包装后再抛，禁止空 catch。
+
+## 日志
+- 统一使用 **SLF4J**：`private static final Logger log = LoggerFactory.getLogger(Xxx.class);`
+- 禁止 `System.out.println()`。
+- 占位符形式：`log.info("create task, robotId={}", robotId);`，禁止字符串拼接。
+- 错误日志必须包含：关键参数、业务 ID、错误信息。示例：`log.error("create task failed, robotId={}, error={}", robotId, e.getMessage());`

@@ -1,0 +1,27 @@
+---
+description: 数据库、性能、测试、Git 与 Code Review 要点
+globs: **/*.java,**/mapper/**/*.xml,**/schema.sql
+alwaysApply: false
+---
+
+# 数据库、性能与质量
+
+## 数据库
+- 表名、字段名：**snake_case**（如 `robot_task`、`created_at`、`updated_at`、`is_deleted`）。
+- 避免 `SELECT *`，按需列出字段。
+- 列表查询必须分页；注意索引与缓存设计。
+
+## 性能与线程安全
+- 分页查询、索引优化、合理使用缓存。
+- 避免可变的静态共享变量（如 `static SimpleDateFormat`），推荐 `DateTimeFormatter` 等线程安全方式。
+
+## 单元测试
+- 覆盖率建议 > 60%。Service 层核心逻辑需有测试。
+- 使用 `@SpringBootTest`、`@Test`，方法名表达场景，如 `createTask_success`。
+
+## Git 提交
+- 格式：`type(scope): description`
+- 示例：`feat(task): add task create api`、`fix(robot): fix status bug`、`refactor(user): optimize service`
+
+## Code Review 检查
+- 命名是否清晰、是否有空指针风险、SQL 是否合理、是否有必要日志、是否符合分层、DTO/VO 是否分离、是否有参数校验与接口文档。

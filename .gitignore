@@ -25,9 +25,7 @@ out/
 .vscode/
 *.code-workspace
 
-# ---- Editor / 本地 ----
-.cursor/
-*.sublime-*
+
 
 # ---- NetBeans ----
 nbproject/private/

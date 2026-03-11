@@ -1,0 +1,16 @@
+---
+description: 企业级 Java 规范总纲（本仓库默认遵守）
+alwaysApply: true
+---
+
+# RobotQcSystem 企业级 Java 规范总纲
+
+本仓库遵循企业级 Java 规范，具体细则见同目录下按场景拆分的规则文件。开发与 AI 生成代码时请遵守：
+
+- **统一命名**：包小写、类 PascalCase、方法动词开头、常量大写下划线、变量有业务含义。
+- **清晰分层**：Controller 只做接收/校验/返回；Service 写业务；Mapper/Repository 只做数据访问。DTO=请求、VO=返回、Entity=表，三者分离。
+- **统一异常与返回**：使用 `Result<T>` 统一返回，业务异常用 `BusinessException`，由 `GlobalExceptionHandler` 处理。
+- **日志规范**：SLF4J，占位符，禁止 System.out；错误日志含关键参数与业务 ID。
+- **编码与格式**：UTF-8、4 空格、类成员顺序（常量→字段→构造→public→private）、单方法 < 80 行、字面量在前防 NPE、集合用泛型。
+- **数据库**：表名字段 snake_case，避免 SELECT *，列表分页，注意索引与缓存。
+- **质量**：参数校验（@Valid）、接口文档（Swagger）、单元测试与 Git 提交格式 type(scope): description。
