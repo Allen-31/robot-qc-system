@@ -11,6 +11,7 @@ import com.zioneer.robotqcsystem.domain.vo.RoleVO;
 import com.zioneer.robotqcsystem.mapper.SysRoleMapper;
 import com.zioneer.robotqcsystem.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 /**
  * 角色管理服务实现
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
@@ -48,6 +50,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public void create(RoleCreateDTO dto) {
         if (sysRoleMapper.selectByCode(dto.getCode()) != null) {
+            log.warn("create role failed, code already exists: code={}", dto.getCode());
             throw new BusinessException("角色编码已存在: " + dto.getCode());
         }
         SysRole role = SysRole.builder()
@@ -58,12 +61,14 @@ public class RoleServiceImpl implements RoleService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         sysRoleMapper.insert(role);
+        log.info("create role, code={}", dto.getCode());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(String code, RoleUpdateDTO dto) {
         if (sysRoleMapper.selectByCode(code) == null) {
+            log.warn("update role failed, role not found: code={}", code);
             throw new BusinessException("角色不存在");
         }
         SysRole role = SysRole.builder()
@@ -73,24 +78,29 @@ public class RoleServiceImpl implements RoleService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         sysRoleMapper.updateByCode(role);
+        log.info("update role, code={}", code);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByCode(String code) {
         if (sysRoleMapper.selectByCode(code) == null) {
+            log.warn("delete role failed, role not found: code={}", code);
             throw new BusinessException("角色不存在");
         }
         int totalRoles = sysRoleMapper.selectList(null).size();
         if (totalRoles <= 1) {
+            log.warn("delete role failed, cannot delete last role: code={}", code);
             throw new BusinessException("至少保留一个角色，禁止删除最后一个角色");
         }
         sysRoleMapper.deleteByCode(code);
+        log.info("delete role, code={}", code);
     }
 
     @Override
     public List<RolePermissionVO> getPermissions(String roleCode) {
         if (sysRoleMapper.selectByCode(roleCode) == null) {
+            log.warn("getPermissions failed, role not found: roleCode={}", roleCode);
             throw new BusinessException("角色不存在");
         }
         List<RolePermission> list = sysRoleMapper.selectPermissionsByRole(roleCode);
@@ -108,6 +118,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public void savePermissions(String roleCode, RolePermissionUpdateDTO dto) {
         if (sysRoleMapper.selectByCode(roleCode) == null) {
+            log.warn("savePermissions failed, role not found: roleCode={}", roleCode);
             throw new BusinessException("角色不存在");
         }
         sysRoleMapper.deletePermissionsByRole(roleCode);
@@ -122,5 +133,6 @@ public class RoleServiceImpl implements RoleService {
                 sysRoleMapper.insertPermission(rp);
             }
         }
+        log.info("save role permissions, roleCode={}", roleCode);
     }
 }

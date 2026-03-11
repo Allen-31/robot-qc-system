@@ -528,7 +528,79 @@
 
 ---
 
-## 六、错误码说明
+## 六、机器人管理
+
+**基础路径**: `/api/robots`  
+**认证**: 所有接口均需要 Bearer Token
+
+### 6.1 分页查询机器人列表
+
+- **URL**: `GET /api/robots`
+
+**Query 参数**（与分页结构一致，可直接用 `UserQuery` 风格对象传参）
+
+| 参数       | 类型   | 必填 | 说明 |
+|------------|--------|------|------|
+| robotCode  | string | 否   | 机器人编码（模糊） |
+| status     | string | 否   | 状态 |
+| pageNum    | number | 否   | 页码，默认 1 |
+| pageSize   | number | 否   | 每页条数，默认 20 |
+
+**成功响应**（200）：`data` 为分页结构，`list` 中每项为机器人对象（`id`、`robotCode`、`robotName`、`model`、`status`、`location`、`lastInspectionAt`）。
+
+### 6.2 机器人详情
+
+- **URL**: `GET /api/robots/{id}`
+- **路径参数**: `id` — 机器人主键
+
+**成功响应**（200）：`data` 为单条机器人对象。
+
+### 6.3 新增机器人
+
+- **URL**: `POST /api/robots`
+- **Content-Type**: `application/json`
+
+**请求体**
+
+| 字段             | 类型   | 必填 | 说明 |
+|------------------|--------|------|------|
+| robotCode        | string | 是   | 机器人编码，唯一 |
+| robotName        | string | 是   | 机器人名称 |
+| model            | string | 否   | 型号 |
+| status           | string | 是   | 状态 |
+| location         | string | 否   | 位置 |
+| lastInspectionAt | string | 否   | 最近巡检时间（日期时间格式） |
+
+**成功响应**（200）：`data` 为新机器人主键 `id`。
+
+### 6.4 更新机器人
+
+- **URL**: `PUT /api/robots/{id}`
+- **路径参数**: `id` — 机器人主键
+- **Content-Type**: `application/json`
+
+**请求体**
+
+| 字段             | 类型   | 必填 | 说明 |
+|------------------|--------|------|------|
+| robotName        | string | 是   | 机器人名称 |
+| model            | string | 否   | 型号 |
+| status           | string | 是   | 状态 |
+| location         | string | 否   | 位置 |
+| lastInspectionAt | string | 否   | 最近巡检时间 |
+
+**成功响应**（200）：`data` 为 null。
+
+### 6.5 删除机器人
+
+- **URL**: `DELETE /api/robots/{id}`
+- **路径参数**: `id` — 机器人主键
+
+**成功响应**（200）：`data` 为 null。
+
+---
+
+## 七、错误码说明
 
 | code | 说明       |
 |------|------------|
@@ -544,7 +616,7 @@
 
 ---
 
-## 七、在线文档与 OpenAPI
+## 八、在线文档与 OpenAPI
 
 - **Swagger UI（在线调试）**  
   服务启动后访问：`http://{host}:8080/swagger-ui.html`  

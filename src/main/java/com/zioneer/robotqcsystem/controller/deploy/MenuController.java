@@ -44,7 +44,7 @@ public class MenuController {
     @PutMapping("/{id}")
     public Result<Void> update(
             @Parameter(description = "菜单主键") @PathVariable Long id,
-            @RequestBody MenuUpdateDTO dto) {
+            @RequestBody @Valid MenuUpdateDTO dto) {
         menuService.update(id, dto);
         return Result.ok();
     }

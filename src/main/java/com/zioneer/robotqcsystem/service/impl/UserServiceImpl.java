@@ -1,16 +1,20 @@
 package com.zioneer.robotqcsystem.service.impl;
 
 import com.zioneer.robotqcsystem.common.exception.BusinessException;
-import com.zioneer.robotqcsystem.common.page.PageQuery;
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.common.result.ResultCode;
-import com.zioneer.robotqcsystem.domain.dto.*;
+import com.zioneer.robotqcsystem.domain.dto.PasswordUpdateDTO;
+import com.zioneer.robotqcsystem.domain.dto.UserCreateDTO;
+import com.zioneer.robotqcsystem.domain.dto.UserQuery;
+import com.zioneer.robotqcsystem.domain.dto.UserRolesUpdateDTO;
+import com.zioneer.robotqcsystem.domain.dto.UserUpdateDTO;
 import com.zioneer.robotqcsystem.domain.entity.SysUser;
 import com.zioneer.robotqcsystem.domain.vo.PasswordUpdateResultVO;
 import com.zioneer.robotqcsystem.domain.vo.UserListVO;
 import com.zioneer.robotqcsystem.mapper.SysUserMapper;
 import com.zioneer.robotqcsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 /**
  * 用户管理服务实现
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -31,18 +36,19 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public PageResult<UserListVO> page(String keyword, String role, String status, PageQuery pageQuery) {
-        long total = sysUserMapper.countList(keyword, role, status);
+    public PageResult<UserListVO> page(UserQuery query) {
+        long total = sysUserMapper.countList(query.getKeyword(), query.getRole(), query.getStatus());
         if (total == 0) {
-            return PageResult.empty(pageQuery);
+            return PageResult.empty(query);
         }
-        List<SysUser> list = sysUserMapper.selectList(keyword, role, status, pageQuery.getOffset(), pageQuery.getPageSize());
+        List<SysUser> list = sysUserMapper.selectList(query.getKeyword(), query.getRole(), query.getStatus(),
+                query.getOffset(), query.getPageSize());
         List<UserListVO> voList = list.stream()
                 .map(this::toListVO)
                 .collect(Collectors.toList());
         // 去重：同一用户可能多行（多角色），合并为一条
         List<UserListVO> merged = mergeUserListVO(voList);
-        return PageResult.of(merged, total, pageQuery.getPageNum(), pageQuery.getPageSize());
+        return PageResult.of(merged, total, query.getPageNum(), query.getPageSize());
     }
 
     private UserListVO toListVO(SysUser u) {
@@ -74,6 +80,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void create(UserCreateDTO dto) {
         if (sysUserMapper.selectByCode(dto.getCode()) != null) {
+            log.warn("create user failed, code already exists: code={}", dto.getCode());
             throw new BusinessException("用户编码已存在: " + dto.getCode());
         }
         SysUser user = SysUser.builder()
@@ -92,6 +99,7 @@ public class UserServiceImpl implements UserService {
                 sysUserMapper.insertUserRole(dto.getCode(), roleCode);
             }
         }
+        log.info("create user, code={}", dto.getCode());
     }
 
     @Override
@@ -99,6 +107,7 @@ public class UserServiceImpl implements UserService {
     public void update(String code, UserUpdateDTO dto) {
         SysUser exist = sysUserMapper.selectByCode(code);
         if (exist == null) {
+            log.warn("update user failed, user not found: code={}", code);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
         SysUser user = SysUser.builder()
@@ -116,22 +125,26 @@ public class UserServiceImpl implements UserService {
                 sysUserMapper.insertUserRole(code, roleCode);
             }
         }
+        log.info("update user, code={}", code);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByCode(String code) {
         if (sysUserMapper.selectByCode(code) == null) {
+            log.warn("delete user failed, user not found: code={}", code);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
         sysUserMapper.deleteUserRoles(code);
         sysUserMapper.deleteByCode(code);
+        log.info("delete user, code={}", code);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRoles(String code, UserRolesUpdateDTO dto) {
         if (sysUserMapper.selectByCode(code) == null) {
+            log.warn("updateRoles failed, user not found: code={}", code);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
         sysUserMapper.deleteUserRoles(code);
@@ -140,15 +153,18 @@ public class UserServiceImpl implements UserService {
                 sysUserMapper.insertUserRole(code, roleCode);
             }
         }
+        log.info("update user roles, code={}", code);
     }
 
     @Override
     public PasswordUpdateResultVO updatePassword(String code, PasswordUpdateDTO dto) {
         SysUser user = sysUserMapper.selectByCode(code);
         if (user == null) {
+            log.warn("updatePassword failed, user not found: code={}", code);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");
         }
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPasswordHash())) {
+            log.warn("updatePassword failed, old password invalid: code={}", code);
             return PasswordUpdateResultVO.builder().success(false).error("old_password_invalid").build();
         }
         LocalDateTime now = LocalDateTime.now();

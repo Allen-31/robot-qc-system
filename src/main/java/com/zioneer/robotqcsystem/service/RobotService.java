@@ -1,23 +1,25 @@
 package com.zioneer.robotqcsystem.service;
 
-import com.zioneer.robotqcsystem.common.page.PageQuery;
 import com.zioneer.robotqcsystem.common.page.PageResult;
-import com.zioneer.robotqcsystem.domain.entity.Robot;
+import com.zioneer.robotqcsystem.domain.dto.RobotCreateDTO;
+import com.zioneer.robotqcsystem.domain.dto.RobotQuery;
+import com.zioneer.robotqcsystem.domain.dto.RobotUpdateDTO;
+import com.zioneer.robotqcsystem.domain.vo.RobotVO;
 
 /**
  * 机器人业务接口
  */
 public interface RobotService {
 
-    Robot getById(Long id);
+    RobotVO getById(Long id);
 
-    Robot getByRobotCode(String robotCode);
+    RobotVO getByRobotCode(String robotCode);
 
-    PageResult<Robot> page(String robotCode, String status, PageQuery pageQuery);
+    PageResult<RobotVO> page(RobotQuery query);
 
-    Long create(Robot robot);
+    Long create(RobotCreateDTO dto);
 
-    void update(Robot robot);
+    void update(Long id, RobotUpdateDTO dto);
 
     void deleteById(Long id);
 }

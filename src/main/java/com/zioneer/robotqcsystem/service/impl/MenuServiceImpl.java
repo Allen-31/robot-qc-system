@@ -10,6 +10,7 @@ import com.zioneer.robotqcsystem.domain.vo.MenuTreeNodeVO;
 import com.zioneer.robotqcsystem.mapper.SysMenuMapper;
 import com.zioneer.robotqcsystem.service.MenuService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * 菜单管理服务实现
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
@@ -67,9 +69,11 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public Long create(MenuCreateDTO dto) {
         if (sysMenuMapper.selectByCode(dto.getCode()) != null) {
+            log.warn("create menu failed, code already exists: code={}", dto.getCode());
             throw new BusinessException("菜单编码已存在: " + dto.getCode());
         }
         if (dto.getParentId() != null && sysMenuMapper.selectById(dto.getParentId()) == null) {
+            log.warn("create menu failed, parent not found: parentId={}", dto.getParentId());
             throw new BusinessException("父菜单不存在");
         }
         SysMenu menu = SysMenu.builder()
@@ -85,6 +89,7 @@ public class MenuServiceImpl implements MenuService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         sysMenuMapper.insert(menu);
+        log.info("create menu, code={}, id={}", dto.getCode(), menu.getId());
         return menu.getId();
     }
 
@@ -93,6 +98,7 @@ public class MenuServiceImpl implements MenuService {
     public void update(Long id, MenuUpdateDTO dto) {
         SysMenu exist = sysMenuMapper.selectById(id);
         if (exist == null) {
+            log.warn("update menu failed, menu not found: id={}", id);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "菜单不存在");
         }
         SysMenu menu = SysMenu.builder()
@@ -106,6 +112,7 @@ public class MenuServiceImpl implements MenuService {
         if (dto.getPermission() != null) menu.setPermission(dto.getPermission());
         if (dto.getStatus() != null) menu.setStatus(dto.getStatus());
         sysMenuMapper.updateById(menu);
+        log.info("update menu, id={}", id);
     }
 
     @Override
@@ -113,13 +120,16 @@ public class MenuServiceImpl implements MenuService {
     public void deleteById(Long id) {
         SysMenu exist = sysMenuMapper.selectById(id);
         if (exist == null) {
+            log.warn("delete menu failed, menu not found: id={}", id);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "菜单不存在");
         }
         int childCount = sysMenuMapper.countByParentId(id);
         if (childCount > 0) {
+            log.warn("delete menu failed, has children: id={}, childCount={}", id, childCount);
             throw new BusinessException("存在子菜单，无法删除");
         }
         sysMenuMapper.deleteById(id);
+        log.info("delete menu, id={}, code={}", id, exist.getCode());
     }
 
     @Override

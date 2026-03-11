@@ -1,6 +1,5 @@
 package com.zioneer.robotqcsystem.service;
 
-import com.zioneer.robotqcsystem.common.page.PageQuery;
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.domain.dto.*;
 
@@ -9,7 +8,7 @@ import com.zioneer.robotqcsystem.domain.dto.*;
  */
 public interface UserService {
 
-    PageResult<com.zioneer.robotqcsystem.domain.vo.UserListVO> page(String keyword, String role, String status, PageQuery pageQuery);
+    PageResult<com.zioneer.robotqcsystem.domain.vo.UserListVO> page(UserQuery query);
 
     void create(UserCreateDTO dto);
 

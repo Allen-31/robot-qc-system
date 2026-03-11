@@ -1,9 +1,12 @@
 package com.zioneer.robotqcsystem.controller.deploy;
 
-import com.zioneer.robotqcsystem.common.page.PageQuery;
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.common.result.Result;
-import com.zioneer.robotqcsystem.domain.dto.*;
+import com.zioneer.robotqcsystem.domain.dto.PasswordUpdateDTO;
+import com.zioneer.robotqcsystem.domain.dto.UserCreateDTO;
+import com.zioneer.robotqcsystem.domain.dto.UserQuery;
+import com.zioneer.robotqcsystem.domain.dto.UserRolesUpdateDTO;
+import com.zioneer.robotqcsystem.domain.dto.UserUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.PasswordUpdateResultVO;
 import com.zioneer.robotqcsystem.domain.vo.UserListVO;
 import com.zioneer.robotqcsystem.service.UserService;
@@ -27,12 +30,8 @@ public class UserController {
 
     @Operation(summary = "用户分页列表")
     @GetMapping
-    public Result<PageResult<UserListVO>> page(
-            @Parameter(description = "关键词：编码/姓名/手机/邮箱/角色") @RequestParam(required = false) String keyword,
-            @Parameter(description = "角色编码") @RequestParam(required = false) String role,
-            @Parameter(description = "状态：enabled/disabled") @RequestParam(required = false) String status,
-            @Valid PageQuery pageQuery) {
-        return Result.ok(userService.page(keyword, role, status, pageQuery));
+    public Result<PageResult<UserListVO>> page(@Valid UserQuery query) {
+        return Result.ok(userService.page(query));
     }
 
     @Operation(summary = "新增用户")
@@ -62,7 +61,7 @@ public class UserController {
     @PutMapping("/{code}/roles")
     public Result<Void> updateRoles(
             @Parameter(description = "用户编码") @PathVariable String code,
-            @RequestBody UserRolesUpdateDTO dto) {
+            @RequestBody @Valid UserRolesUpdateDTO dto) {
         userService.updateRoles(code, dto);
         return Result.ok();
     }
