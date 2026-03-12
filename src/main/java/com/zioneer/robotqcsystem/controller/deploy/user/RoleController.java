@@ -1,4 +1,4 @@
-package com.zioneer.robotqcsystem.controller.deploy;
+package com.zioneer.robotqcsystem.controller.deploy.user;
 
 import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.domain.dto.RoleCreateDTO;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 角色管理（部署配置 - 角色）
+ * 角色管理（deploy-user 模块）
  */
 @Tag(name = "角色管理", description = "角色增删改查、权限配置")
 @RestController

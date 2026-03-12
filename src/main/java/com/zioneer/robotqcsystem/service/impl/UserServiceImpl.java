@@ -1,5 +1,6 @@
 package com.zioneer.robotqcsystem.service.impl;
 
+import com.zioneer.robotqcsystem.common.constant.CommonConstant;
 import com.zioneer.robotqcsystem.common.exception.BusinessException;
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.common.result.ResultCode;
@@ -131,6 +132,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByCode(String code) {
+        if (CommonConstant.SUPER_ADMIN_USER_CODE.equalsIgnoreCase(code)) {
+            log.warn("delete user failed, super admin cannot be deleted: code={}", code);
+            throw new BusinessException(ResultCode.BUSINESS_ERROR.getCode(), "超级管理员账号禁止删除");
+        }
         if (sysUserMapper.selectByCode(code) == null) {
             log.warn("delete user failed, user not found: code={}", code);
             throw new BusinessException(ResultCode.NOT_FOUND.getCode(), "用户不存在");

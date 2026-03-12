@@ -1,4 +1,4 @@
-package com.zioneer.robotqcsystem.controller.deploy;
+package com.zioneer.robotqcsystem.controller.deploy.user;
 
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.common.result.Result;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 用户管理（部署配置 - 用户）
+ * 用户管理（deploy-user 模块）
  */
 @Tag(name = "用户管理", description = "用户增删改查、角色分配、修改密码")
 @RestController

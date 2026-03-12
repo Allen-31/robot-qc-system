@@ -1,4 +1,4 @@
-package com.zioneer.robotqcsystem.controller.deploy;
+package com.zioneer.robotqcsystem.controller.deploy.user;
 
 import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.domain.dto.MenuCreateDTO;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 菜单管理（部署配置 - 菜单）
+ * 菜单/权限管理（deploy-user 模块）
  */
 @Tag(name = "菜单管理", description = "菜单树增删改查与排序")
 @RestController

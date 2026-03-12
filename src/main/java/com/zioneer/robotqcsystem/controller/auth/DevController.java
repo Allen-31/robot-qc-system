@@ -1,4 +1,4 @@
-package com.zioneer.robotqcsystem.controller;
+package com.zioneer.robotqcsystem.controller.auth;
 
 import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.mapper.SysUserMapper;
@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 /**
- * 仅当 app.dev.reset-admin-enabled=true 时生效，用于本地把 admin 密码重置为 admin123。
- * 生产环境勿开启。
+ * 开发辅助（auth 模块，仅开发环境启用）
  */
 @Tag(name = "开发辅助", description = "仅开发环境启用")
 @RestController

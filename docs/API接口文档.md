@@ -239,7 +239,8 @@
 - **URL**: `DELETE /api/deploy/users/{code}`
 - **路径参数**: `code` — 用户编码
 
-**成功响应**（200）：`data` 为 null。
+**成功响应**（200）：`data` 为 null。  
+**失败**：若删除的是超级管理员账号（`admin`），`message` 为「超级管理员账号禁止删除」。
 
 ---
 
@@ -375,7 +376,7 @@
 - **路径参数**: `code` — 角色编码
 
 **成功响应**（200）：`data` 为 null。  
-**失败**：若为最后一个角色，`message` 会提示「至少保留一个角色」等，前端可按需解析。
+**失败**：若删除的是超级管理员角色（`admin`），`message` 为「超级管理员角色禁止删除」；若为最后一个角色，`message` 会提示「至少保留一个角色」等，前端可按需解析。
 
 ---
 
@@ -530,12 +531,12 @@
 
 ## 六、机器人管理
 
-**基础路径**: `/api/robots`  
+**基础路径**: `/api/deploy/robots`  
 **认证**: 所有接口均需要 Bearer Token
 
 ### 6.1 分页查询机器人列表
 
-- **URL**: `GET /api/robots`
+- **URL**: `GET /api/deploy/robots`
 
 **Query 参数**（与分页结构一致，可直接用 `UserQuery` 风格对象传参）
 
@@ -550,14 +551,14 @@
 
 ### 6.2 机器人详情
 
-- **URL**: `GET /api/robots/{id}`
+- **URL**: `GET /api/deploy/robots/{id}`
 - **路径参数**: `id` — 机器人主键
 
 **成功响应**（200）：`data` 为单条机器人对象。
 
 ### 6.3 新增机器人
 
-- **URL**: `POST /api/robots`
+- **URL**: `POST /api/deploy/robots`
 - **Content-Type**: `application/json`
 
 **请求体**
@@ -575,7 +576,7 @@
 
 ### 6.4 更新机器人
 
-- **URL**: `PUT /api/robots/{id}`
+- **URL**: `PUT /api/deploy/robots/{id}`
 - **路径参数**: `id` — 机器人主键
 - **Content-Type**: `application/json`
 
@@ -593,7 +594,7 @@
 
 ### 6.5 删除机器人
 
-- **URL**: `DELETE /api/robots/{id}`
+- **URL**: `DELETE /api/deploy/robots/{id}`
 - **路径参数**: `id` — 机器人主键
 
 **成功响应**（200）：`data` 为 null。

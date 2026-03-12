@@ -1,4 +1,4 @@
-package com.zioneer.robotqcsystem.controller;
+package com.zioneer.robotqcsystem.controller.auth;
 
 import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.domain.dto.LoginRequest;
@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 登录与认证
+ * 登录与认证（auth 模块）
  */
 @Tag(name = "登录与认证", description = "登录、登出、获取当前用户")
 @RestController

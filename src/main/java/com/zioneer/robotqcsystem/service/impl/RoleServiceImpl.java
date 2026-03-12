@@ -1,5 +1,6 @@
 package com.zioneer.robotqcsystem.service.impl;
 
+import com.zioneer.robotqcsystem.common.constant.CommonConstant;
 import com.zioneer.robotqcsystem.common.exception.BusinessException;
 import com.zioneer.robotqcsystem.domain.dto.RoleCreateDTO;
 import com.zioneer.robotqcsystem.domain.dto.RolePermissionUpdateDTO;
@@ -84,6 +85,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByCode(String code) {
+        if (CommonConstant.SUPER_ADMIN_ROLE_CODE.equalsIgnoreCase(code)) {
+            log.warn("delete role failed, super admin role cannot be deleted: code={}", code);
+            throw new BusinessException("超级管理员角色禁止删除");
+        }
         if (sysRoleMapper.selectByCode(code) == null) {
             log.warn("delete role failed, role not found: code={}", code);
             throw new BusinessException("角色不存在");

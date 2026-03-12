@@ -1,4 +1,4 @@
-package com.zioneer.robotqcsystem.controller;
+package com.zioneer.robotqcsystem.controller.deploy.robot;
 
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.common.result.Result;
@@ -15,11 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 机器人管理接口
+ * 机器人管理（deploy-robot 模块：机器人类型/基础数据）
  */
 @Tag(name = "机器人管理", description = "机器人信息的增删改查")
 @RestController
-@RequestMapping("/api/robots")
+@RequestMapping("/api/deploy/robots")
 @RequiredArgsConstructor
 public class RobotController {
 
