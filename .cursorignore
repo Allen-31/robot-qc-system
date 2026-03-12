@@ -1,0 +1,41 @@
+# ===== Gradle =====
+.gradle/
+**/build/
+out/
+
+# ===== compiled =====
+*.class
+*.jar
+*.war
+*.ear
+
+# ===== logs =====
+logs/
+*.log
+
+# ===== temp =====
+tmp/
+temp/
+
+# ===== git =====
+.git/
+
+# ===== ide =====
+.idea/
+.vscode/
+*.iml
+
+# ===== system =====
+.DS_Store
+Thumbs.db
+
+# ===== env =====
+.env*
+
+# ===== reports =====
+test-results/
+coverage/
+
+# ===== docker =====
+docker-build/
+
