@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.RobotPartMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.RobotPart">
+        <id column="id" property="id"/>
+        <result column="part_no" property="partNo"/>
+        <result column="name" property="name"/>
+        <result column="position" property="position"/>
+        <result column="type" property="type"/>
+        <result column="model" property="model"/>
+        <result column="vendor" property="vendor"/>
+        <result column="supplier" property="supplier"/>
+        <result column="lifecycle" property="lifecycle"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="ParamResultMap" type="com.zioneer.robotqcsystem.domain.entity.RobotPartParam">
+        <id column="id" property="id"/>
+        <result column="part_id" property="partId"/>
+        <result column="name" property="name"/>
+        <result column="value" property="value"/>
+        <result column="unit" property="unit"/>
+        <result column="range" property="range"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, part_no, name, position, type, model, vendor, supplier, lifecycle, status, remark, created_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot_part
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByPartNo" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot_part
+        WHERE part_no = #{partNo}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot_part
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (part_no LIKE '%' || #{keyword} || '%'
+                OR name LIKE '%' || #{keyword} || '%'
+                OR model LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1)
+        FROM robot_part
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (part_no LIKE '%' || #{keyword} || '%'
+                OR name LIKE '%' || #{keyword} || '%'
+                OR model LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO robot_part (part_no, name, position, type, model, vendor, supplier, lifecycle, status, remark, created_at, updated_at)
+        VALUES (#{partNo}, #{name}, #{position}, #{type}, #{model}, #{vendor}, #{supplier}, #{lifecycle},
+        #{status}, #{remark}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE robot_part
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="vendor != null">vendor = #{vendor},</if>
+            <if test="supplier != null">supplier = #{supplier},</if>
+            <if test="lifecycle != null">lifecycle = #{lifecycle},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM robot_part WHERE id = #{id}
+    </delete>
+
+    <select id="selectParamsByPartId" resultMap="ParamResultMap">
+        SELECT id, part_id, name, value, unit, range, sort_order, created_at, updated_at
+        FROM robot_part_param
+        WHERE part_id = #{partId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <delete id="deleteParamsByPartId">
+        DELETE FROM robot_part_param WHERE part_id = #{partId}
+    </delete>
+
+    <insert id="insertParam" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO robot_part_param (part_id, name, value, unit, range, sort_order, created_at, updated_at)
+        VALUES (#{param.partId}, #{param.name}, #{param.value}, #{param.unit}, #{param.range},
+        #{param.sortOrder}, #{param.createdAt}, #{param.updatedAt})
+    </insert>
+</mapper>

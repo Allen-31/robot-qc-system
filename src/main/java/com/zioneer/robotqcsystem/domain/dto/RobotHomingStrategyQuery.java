@@ -1,0 +1,21 @@
+package com.zioneer.robotqcsystem.domain.dto;
+
+import com.zioneer.robotqcsystem.common.page.PageQuery;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 归位策略分页查询条件。
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Schema(description = "归位策略分页查询条件")
+public class RobotHomingStrategyQuery extends PageQuery {
+
+    @Schema(description = "关键字（编码/名称）")
+    private String keyword;
+
+    @Schema(description = "状态")
+    private String status;
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.SceneMapMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.SceneMap">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="edit_status" property="editStatus"/>
+        <result column="publish_status" property="publishStatus"/>
+        <result column="map_file_url" property="mapFileUrl"/>
+        <result column="map_version" property="mapVersion"/>
+        <result column="resolution" property="resolution"/>
+        <result column="origin_x" property="originX"/>
+        <result column="origin_y" property="originY"/>
+        <result column="edited_by" property="editedBy"/>
+        <result column="edited_at" property="editedAt"/>
+        <result column="published_by" property="publishedBy"/>
+        <result column="published_at" property="publishedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, code, name, type, edit_status, publish_status, map_file_url, map_version, resolution, origin_x, origin_y,
+        edited_by, edited_at, published_by, published_at, created_at, updated_at
+    </sql>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM scene_map
+        WHERE code = #{code}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM scene_map
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code LIKE '%' || #{keyword} || '%'
+                OR name LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="editStatus != null and editStatus != ''">
+                AND edit_status = #{editStatus}
+            </if>
+            <if test="publishStatus != null and publishStatus != ''">
+                AND publish_status = #{publishStatus}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1)
+        FROM scene_map
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code LIKE '%' || #{keyword} || '%'
+                OR name LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="editStatus != null and editStatus != ''">
+                AND edit_status = #{editStatus}
+            </if>
+            <if test="publishStatus != null and publishStatus != ''">
+                AND publish_status = #{publishStatus}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO scene_map (code, name, type, edit_status, publish_status, map_file_url, map_version,
+        resolution, origin_x, origin_y, edited_by, edited_at, published_by, published_at, created_at, updated_at)
+        VALUES (#{code}, #{name}, #{type}, #{editStatus}, #{publishStatus}, #{mapFileUrl}, #{mapVersion},
+        #{resolution}, #{originX}, #{originY}, #{editedBy}, #{editedAt}, #{publishedBy}, #{publishedAt},
+        #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateByCode">
+        UPDATE scene_map
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="editStatus != null">edit_status = #{editStatus},</if>
+            <if test="publishStatus != null">publish_status = #{publishStatus},</if>
+            <if test="mapFileUrl != null">map_file_url = #{mapFileUrl},</if>
+            <if test="mapVersion != null">map_version = #{mapVersion},</if>
+            <if test="resolution != null">resolution = #{resolution},</if>
+            <if test="originX != null">origin_x = #{originX},</if>
+            <if test="originY != null">origin_y = #{originY},</if>
+            <if test="editedBy != null">edited_by = #{editedBy},</if>
+            <if test="editedAt != null">edited_at = #{editedAt},</if>
+            <if test="publishedBy != null">published_by = #{publishedBy},</if>
+            <if test="publishedAt != null">published_at = #{publishedAt},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE code = #{code}
+    </update>
+
+    <delete id="deleteByCode">
+        DELETE FROM scene_map WHERE code = #{code}
+    </delete>
+</mapper>
