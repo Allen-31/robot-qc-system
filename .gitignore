@@ -3,6 +3,7 @@
 # ---- Gradle ----
 .gradle/
 build/
+bin/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -24,7 +25,7 @@ out/
 .sts4-cache
 .vscode/
 *.code-workspace
-
+.gradle-user
 
 
 # ---- NetBeans ----

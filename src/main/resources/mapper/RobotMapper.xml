@@ -6,14 +6,36 @@
         <id column="id" property="id"/>
         <result column="robot_code" property="robotCode"/>
         <result column="robot_name" property="robotName"/>
+        <result column="serial_no" property="serialNo"/>
+        <result column="ip" property="ip"/>
         <result column="model" property="model"/>
+        <result column="firmware_version" property="firmwareVersion"/>
+        <result column="robot_type_no" property="robotTypeNo"/>
+        <result column="robot_type_name" property="robotTypeName"/>
+        <result column="group_no" property="groupNo"/>
+        <result column="group_name" property="groupName"/>
         <result column="status" property="status"/>
+        <result column="online_status" property="onlineStatus"/>
+        <result column="battery" property="battery"/>
+        <result column="mileage_km" property="mileageKm"/>
+        <result column="current_map_code" property="currentMapCode"/>
+        <result column="current_map_name" property="currentMapName"/>
+        <result column="dispatch_mode" property="dispatchMode"/>
+        <result column="control_status" property="controlStatus"/>
+        <result column="exception_status" property="exceptionStatus"/>
+        <result column="video_url" property="videoUrl"/>
         <result column="location" property="location"/>
         <result column="last_inspection_at" property="lastInspectionAt"/>
+        <result column="registered_at" property="registeredAt"/>
+        <result column="last_online_at" property="lastOnlineAt"/>
+        <result column="last_heartbeat_at" property="lastHeartbeatAt"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, robot_code, robot_name, model, status, location, last_inspection_at
+        id, robot_code, robot_name, serial_no, ip, model, firmware_version, robot_type_no, robot_type_name,
+        group_no, group_name, status, online_status, battery, mileage_km, current_map_code, current_map_name,
+        dispatch_mode, control_status, exception_status, video_url, location, last_inspection_at,
+        registered_at, last_online_at, last_heartbeat_at
     </sql>
 
     <select id="selectById" resultMap="BaseResultMap">
@@ -43,6 +65,40 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
+    <select id="selectListByQuery" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot
+        <where>
+            <if test="query.keyword != null and query.keyword != ''">
+                AND (robot_code LIKE '%' || #{query.keyword} || '%'
+                OR robot_name LIKE '%' || #{query.keyword} || '%'
+                OR serial_no LIKE '%' || #{query.keyword} || '%'
+                OR ip LIKE '%' || #{query.keyword} || '%')
+            </if>
+            <if test="query.robotCode != null and query.robotCode != ''">
+                AND robot_code LIKE '%' || #{query.robotCode} || '%'
+            </if>
+            <if test="query.status != null and query.status != ''">
+                AND status = #{query.status}
+            </if>
+            <if test="query.robotTypeNo != null and query.robotTypeNo != ''">
+                AND robot_type_no = #{query.robotTypeNo}
+            </if>
+            <if test="query.groupNo != null and query.groupNo != ''">
+                AND group_no = #{query.groupNo}
+            </if>
+            <if test="query.onlineStatus != null and query.onlineStatus != ''">
+                AND online_status = #{query.onlineStatus}
+            </if>
+            <if test="query.exceptionStatus != null and query.exceptionStatus != ''">
+                AND exception_status = #{query.exceptionStatus}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+
     <select id="countList" resultType="long">
         SELECT COUNT(1)
         FROM robot
@@ -57,18 +113,43 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO robot (id, robot_code, robot_name, model, status, location, last_inspection_at)
-        VALUES (#{id}, #{robotCode}, #{robotName}, #{model}, #{status}, #{location}, #{lastInspectionAt})
+        INSERT INTO robot (id, robot_code, robot_name, serial_no, ip, model, firmware_version, robot_type_no, robot_type_name,
+            group_no, group_name, status, online_status, battery, mileage_km, current_map_code, current_map_name,
+            dispatch_mode, control_status, exception_status, video_url, location, last_inspection_at,
+            registered_at, last_online_at, last_heartbeat_at)
+        VALUES (#{id}, #{robotCode}, #{robotName}, #{serialNo}, #{ip}, #{model}, #{firmwareVersion}, #{robotTypeNo}, #{robotTypeName},
+            #{groupNo}, #{groupName}, #{status}, #{onlineStatus}, #{battery}, #{mileageKm}, #{currentMapCode}, #{currentMapName},
+            #{dispatchMode}, #{controlStatus}, #{exceptionStatus}, #{videoUrl}, #{location}, #{lastInspectionAt},
+            #{registeredAt}, #{lastOnlineAt}, #{lastHeartbeatAt})
     </insert>
 
     <update id="updateById">
         UPDATE robot
         <set>
             <if test="robotName != null">robot_name = #{robotName},</if>
+            <if test="serialNo != null">serial_no = #{serialNo},</if>
+            <if test="ip != null">ip = #{ip},</if>
             <if test="model != null">model = #{model},</if>
+            <if test="firmwareVersion != null">firmware_version = #{firmwareVersion},</if>
+            <if test="robotTypeNo != null">robot_type_no = #{robotTypeNo},</if>
+            <if test="robotTypeName != null">robot_type_name = #{robotTypeName},</if>
+            <if test="groupNo != null">group_no = #{groupNo},</if>
+            <if test="groupName != null">group_name = #{groupName},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="onlineStatus != null">online_status = #{onlineStatus},</if>
+            <if test="battery != null">battery = #{battery},</if>
+            <if test="mileageKm != null">mileage_km = #{mileageKm},</if>
+            <if test="currentMapCode != null">current_map_code = #{currentMapCode},</if>
+            <if test="currentMapName != null">current_map_name = #{currentMapName},</if>
+            <if test="dispatchMode != null">dispatch_mode = #{dispatchMode},</if>
+            <if test="controlStatus != null">control_status = #{controlStatus},</if>
+            <if test="exceptionStatus != null">exception_status = #{exceptionStatus},</if>
+            <if test="videoUrl != null">video_url = #{videoUrl},</if>
             <if test="location != null">location = #{location},</if>
             <if test="lastInspectionAt != null">last_inspection_at = #{lastInspectionAt},</if>
+            <if test="registeredAt != null">registered_at = #{registeredAt},</if>
+            <if test="lastOnlineAt != null">last_online_at = #{lastOnlineAt},</if>
+            <if test="lastHeartbeatAt != null">last_heartbeat_at = #{lastHeartbeatAt},</if>
         </set>
         WHERE id = #{id}
     </update>

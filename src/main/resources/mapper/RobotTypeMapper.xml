@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.RobotTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.RobotType">
+        <id column="id" property="id"/>
+        <result column="type_no" property="typeNo"/>
+        <result column="type_name" property="typeName"/>
+        <result column="image_2d" property="image2d"/>
+        <result column="image_2d_data" property="image2dData"/>
+        <result column="parts_count" property="partsCount"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="PointResultMap" type="com.zioneer.robotqcsystem.domain.entity.RobotTypePoint">
+        <id column="id" property="id"/>
+        <result column="robot_type_id" property="robotTypeId"/>
+        <result column="part_name" property="partName"/>
+        <result column="part_position" property="partPosition"/>
+        <result column="x" property="x"/>
+        <result column="y" property="y"/>
+        <result column="rotation" property="rotation"/>
+        <result column="remark" property="remark"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, type_no, type_name, image_2d, image_2d_data, parts_count, status, created_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot_type
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByTypeNo" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot_type
+        WHERE type_no = #{typeNo}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM robot_type
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (type_no LIKE '%' || #{keyword} || '%'
+                OR type_name LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1)
+        FROM robot_type
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (type_no LIKE '%' || #{keyword} || '%'
+                OR type_name LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO robot_type (type_no, type_name, image_2d, image_2d_data, parts_count, status, created_at, updated_at)
+        VALUES (#{typeNo}, #{typeName}, #{image2d}, #{image2dData}, #{partsCount}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE robot_type
+        <set>
+            <if test="typeName != null">type_name = #{typeName},</if>
+            <if test="image2d != null">image_2d = #{image2d},</if>
+            <if test="image2dData != null">image_2d_data = #{image2dData},</if>
+            <if test="partsCount != null">parts_count = #{partsCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM robot_type WHERE id = #{id}
+    </delete>
+
+    <select id="selectPointsByTypeId" resultMap="PointResultMap">
+        SELECT id, robot_type_id, part_name, part_position, x, y, rotation, remark, sort_order, created_at, updated_at
+        FROM robot_type_point
+        WHERE robot_type_id = #{robotTypeId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <delete id="deletePointsByTypeId">
+        DELETE FROM robot_type_point WHERE robot_type_id = #{robotTypeId}
+    </delete>
+
+    <insert id="insertPoint" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO robot_type_point (robot_type_id, part_name, part_position, x, y, rotation, remark, sort_order, created_at, updated_at)
+        VALUES (#{point.robotTypeId}, #{point.partName}, #{point.partPosition}, #{point.x}, #{point.y},
+        #{point.rotation}, #{point.remark}, #{point.sortOrder}, #{point.createdAt}, #{point.updatedAt})
+    </insert>
+</mapper>

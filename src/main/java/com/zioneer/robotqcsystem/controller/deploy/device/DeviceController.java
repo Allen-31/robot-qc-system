@@ -5,7 +5,7 @@ import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.domain.dto.DeployDeviceCreateDTO;
 import com.zioneer.robotqcsystem.domain.dto.DeployDeviceUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.DeployDeviceVO;
-import com.zioneer.robotqcsystem.service.deploy.DeviceService;
+import com.zioneer.robotqcsystem.service.deploy.scene.DeviceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

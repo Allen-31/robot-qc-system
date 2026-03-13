@@ -22,8 +22,27 @@ public class Robot implements Serializable {
     private Long id;
     private String robotCode;
     private String robotName;
+    private String serialNo;
+    private String ip;
     private String model;
+    private String firmwareVersion;
+    private String robotTypeNo;
+    private String robotTypeName;
+    private String groupNo;
+    private String groupName;
     private String status;
+    private String onlineStatus;
+    private Integer battery;
+    private Double mileageKm;
+    private String currentMapCode;
+    private String currentMapName;
+    private String dispatchMode;
+    private String controlStatus;
+    private String exceptionStatus;
+    private String videoUrl;
     private String location;
     private LocalDateTime lastInspectionAt;
+    private LocalDateTime registeredAt;
+    private LocalDateTime lastOnlineAt;
+    private LocalDateTime lastHeartbeatAt;
 }

@@ -6,7 +6,7 @@ import com.zioneer.robotqcsystem.domain.dto.RobotCreateDTO;
 import com.zioneer.robotqcsystem.domain.dto.RobotQuery;
 import com.zioneer.robotqcsystem.domain.dto.RobotUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.RobotVO;
-import com.zioneer.robotqcsystem.service.deploy.RobotService;
+import com.zioneer.robotqcsystem.service.deploy.robot.RobotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

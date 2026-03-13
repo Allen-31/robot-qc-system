@@ -10,7 +10,7 @@ import com.zioneer.robotqcsystem.domain.dto.UserRolesUpdateDTO;
 import com.zioneer.robotqcsystem.domain.dto.UserUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.PasswordUpdateResultVO;
 import com.zioneer.robotqcsystem.domain.vo.UserListVO;
-import com.zioneer.robotqcsystem.service.deploy.UserService;
+import com.zioneer.robotqcsystem.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
