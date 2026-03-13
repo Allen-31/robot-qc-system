@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.DeployDeviceMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.DeployDevice">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="device_group" property="deviceGroup"/>
+        <result column="map_code" property="mapCode"/>
+        <result column="status" property="status"/>
+        <result column="ip" property="ip"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, code, name, type, device_group, map_code, status, ip, created_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_device
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_device
+        WHERE code = #{code}
+    </select>
+
+    <select id="selectListByMapCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_device
+        <where>
+            <if test="mapCode != null and mapCode != ''">
+                AND map_code = #{mapCode}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO deploy_device (id, code, name, type, device_group, map_code, status, ip, created_at, updated_at)
+        VALUES (#{id}, #{code}, #{name}, #{type}, #{deviceGroup}, #{mapCode}, #{status}, #{ip}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE deploy_device
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="deviceGroup != null">device_group = #{deviceGroup},</if>
+            <if test="mapCode != null">map_code = #{mapCode},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="ip != null">ip = #{ip},</if>
+            updated_at = #{updatedAt}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM deploy_device WHERE id = #{id}
+    </delete>
+</mapper>

@@ -2,6 +2,7 @@ package com.zioneer.robotqcsystem.controller.deploy.user;
 
 import com.zioneer.robotqcsystem.common.page.PageResult;
 import com.zioneer.robotqcsystem.common.result.Result;
+import com.zioneer.robotqcsystem.domain.dto.AdminResetPasswordDTO;
 import com.zioneer.robotqcsystem.domain.dto.PasswordUpdateDTO;
 import com.zioneer.robotqcsystem.domain.dto.UserCreateDTO;
 import com.zioneer.robotqcsystem.domain.dto.UserQuery;
@@ -9,7 +10,7 @@ import com.zioneer.robotqcsystem.domain.dto.UserRolesUpdateDTO;
 import com.zioneer.robotqcsystem.domain.dto.UserUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.PasswordUpdateResultVO;
 import com.zioneer.robotqcsystem.domain.vo.UserListVO;
-import com.zioneer.robotqcsystem.service.UserService;
+import com.zioneer.robotqcsystem.service.deploy.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,5 +74,14 @@ public class UserController {
             @RequestBody @Valid PasswordUpdateDTO dto) {
         PasswordUpdateResultVO vo = userService.updatePassword(code, dto);
         return Result.ok(vo);
+    }
+
+    @Operation(summary = "管理员重置密码", description = "无需原密码，用于忘记密码或首次密码未设置成功时")
+    @PutMapping("/{code}/reset-password")
+    public Result<Void> resetPasswordByAdmin(
+            @Parameter(description = "用户编码") @PathVariable String code,
+            @RequestBody @Valid AdminResetPasswordDTO dto) {
+        userService.resetPasswordByAdmin(code, dto);
+        return Result.ok();
     }
 }

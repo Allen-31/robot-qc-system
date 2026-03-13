@@ -6,7 +6,7 @@ import com.zioneer.robotqcsystem.domain.dto.RolePermissionUpdateDTO;
 import com.zioneer.robotqcsystem.domain.dto.RoleUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.RolePermissionVO;
 import com.zioneer.robotqcsystem.domain.vo.RoleVO;
-import com.zioneer.robotqcsystem.service.RoleService;
+import com.zioneer.robotqcsystem.service.deploy.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

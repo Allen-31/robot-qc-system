@@ -5,7 +5,7 @@ import com.zioneer.robotqcsystem.domain.dto.MenuCreateDTO;
 import com.zioneer.robotqcsystem.domain.dto.MenuOrderDTO;
 import com.zioneer.robotqcsystem.domain.dto.MenuUpdateDTO;
 import com.zioneer.robotqcsystem.domain.vo.MenuTreeNodeVO;
-import com.zioneer.robotqcsystem.service.MenuService;
+import com.zioneer.robotqcsystem.service.deploy.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

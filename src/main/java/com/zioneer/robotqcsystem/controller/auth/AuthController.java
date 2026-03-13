@@ -3,10 +3,10 @@ package com.zioneer.robotqcsystem.controller.auth;
 import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.domain.dto.LoginRequest;
 import com.zioneer.robotqcsystem.domain.vo.LoginResponse;
-import com.zioneer.robotqcsystem.service.AuthService;
+import com.zioneer.robotqcsystem.service.auth.AuthService;
+import com.zioneer.robotqcsystem.service.auth.KeycloakLoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -14,28 +14,27 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 登录与认证（auth 模块）
+ * 认证（auth 模块）。BFF 登录：前端使用自有登录页，提交用户名密码到本接口，后端代向 Keycloak 换 token。
  */
-@Tag(name = "登录与认证", description = "登录、登出、获取当前用户")
+@Tag(name = "认证", description = "登录、登出、获取当前用户")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+    private final KeycloakLoginService keycloakLoginService;
 
-    @Operation(summary = "用户登录")
+    @Operation(summary = "登录（BFF：后端代向 Keycloak 换 token，前端使用自有登录页）")
     @PostMapping("/login")
     public Result<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
-        LoginResponse data = authService.login(request);
+        LoginResponse data = keycloakLoginService.login(request);
         return Result.ok(data);
     }
 
     @Operation(summary = "登出")
     @PostMapping("/logout")
-    public Result<LogoutResult> logout(HttpServletRequest request, Authentication authentication) {
-        String token = resolveToken(request);
-        authService.logout(token);
+    public Result<LogoutResult> logout() {
         return Result.ok(LogoutResult.builder().success(true).build());
     }
 
@@ -48,14 +47,6 @@ public class AuthController {
         }
         LoginResponse.UserInfoVO user = authService.getCurrentUser(userCode);
         return Result.ok(user);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7).trim();
-        }
-        return null;
     }
 
     @lombok.Data

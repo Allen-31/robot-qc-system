@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.QcWorkstationMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.QcWorkstation">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="workshop_code" property="workshopCode"/>
+        <result column="status" property="status"/>
+        <result column="robot_group" property="robotGroup"/>
+        <result column="wire_harness_type" property="wireHarnessType"/>
+        <result column="enabled" property="enabled"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">id, code, name, workshop_code, status, robot_group, wire_harness_type, enabled, created_at, updated_at</sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_workstation WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_workstation
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code LIKE '%' || #{keyword} || '%' OR name LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="workshopCode != null and workshopCode != ''">
+                AND workshop_code = #{workshopCode}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO qc_workstation (id, code, name, workshop_code, status, robot_group, wire_harness_type, enabled, created_at, updated_at)
+        VALUES (#{id}, #{code}, #{name}, #{workshopCode}, #{status}, #{robotGroup}, #{wireHarnessType}, #{enabled}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE qc_workstation
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="workshopCode != null">workshop_code = #{workshopCode},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="robotGroup != null">robot_group = #{robotGroup},</if>
+            <if test="wireHarnessType != null">wire_harness_type = #{wireHarnessType},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM qc_workstation WHERE id = #{id}
+    </delete>
+</mapper>

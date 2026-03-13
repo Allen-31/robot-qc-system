@@ -19,6 +19,9 @@ public interface SysRoleMapper {
 
     int insert(SysRole role);
 
+    /** 若 code 不存在则插入，用于 Keycloak 角色在本地 sys_role 占位以满足 sys_role_permission 外键 */
+    int insertIfNotExists(SysRole role);
+
     int updateByCode(SysRole role);
 
     int deleteByCode(@Param("code") String code);

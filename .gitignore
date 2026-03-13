@@ -43,6 +43,7 @@ nbdist/
 logs/
 
 # ---- 本地配置/敏感（不提交） ----
+.keycloak-admin-password
 .env
 .env.*
 !.env.example
@@ -54,6 +55,9 @@ application-local.properties
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# ---- 数据库导出（含数据，不提交） ----
+docs/robot_qc_export.sql
 
 # ---- 临时/备份 ----
 *.bak

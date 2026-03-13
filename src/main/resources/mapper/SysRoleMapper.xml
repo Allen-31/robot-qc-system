@@ -55,6 +55,12 @@
         VALUES (#{code}, #{name}, #{description}, #{createdAt}, #{updatedAt})
     </insert>
 
+    <insert id="insertIfNotExists">
+        INSERT INTO sys_role (code, name, description, created_at, updated_at)
+        VALUES (#{code}, #{name}, #{description}, now(), now())
+        ON CONFLICT (code) DO NOTHING
+    </insert>
+
     <update id="updateByCode">
         UPDATE sys_role
         <set>

@@ -56,9 +56,9 @@
         </where>
     </select>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO robot (robot_code, robot_name, model, status, location, last_inspection_at)
-        VALUES (#{robotCode}, #{robotName}, #{model}, #{status}, #{location}, #{lastInspectionAt})
+    <insert id="insert">
+        INSERT INTO robot (id, robot_code, robot_name, model, status, location, last_inspection_at)
+        VALUES (#{id}, #{robotCode}, #{robotName}, #{model}, #{status}, #{location}, #{lastInspectionAt})
     </insert>
 
     <update id="updateById">

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.QcWireHarnessTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.QcWireHarnessType">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="project" property="project"/>
+        <result column="task_type" property="taskType"/>
+        <result column="planar_structure_file" property="planarStructureFile"/>
+        <result column="three_d_structure_file" property="threeDStructureFile"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">id, name, project, task_type, planar_structure_file, three_d_structure_file, created_at, updated_at</sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_wire_harness_type ORDER BY id ASC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_wire_harness_type WHERE id = #{id}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO qc_wire_harness_type (id, name, project, task_type, planar_structure_file, three_d_structure_file, created_at, updated_at)
+        VALUES (#{id}, #{name}, #{project}, #{taskType}, #{planarStructureFile}, #{threeDStructureFile}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE qc_wire_harness_type
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="project != null">project = #{project},</if>
+            <if test="taskType != null">task_type = #{taskType},</if>
+            <if test="planarStructureFile != null">planar_structure_file = #{planarStructureFile},</if>
+            <if test="threeDStructureFile != null">three_d_structure_file = #{threeDStructureFile},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM qc_wire_harness_type WHERE id = #{id}
+    </delete>
+</mapper>

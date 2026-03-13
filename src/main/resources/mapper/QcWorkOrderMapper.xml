@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.QcWorkOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.QcWorkOrder">
+        <id column="id" property="id"/>
+        <result column="work_order_no" property="workOrderNo"/>
+        <result column="harness_code" property="harnessCode"/>
+        <result column="moving_duration" property="movingDuration"/>
+        <result column="harness_type" property="harnessType"/>
+        <result column="station_code" property="stationCode"/>
+        <result column="station_id" property="stationId"/>
+        <result column="status" property="status"/>
+        <result column="quality_result" property="qualityResult"/>
+        <result column="task_ids" property="taskIds" typeHandler="com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler"/>
+        <result column="detection_duration" property="detectionDuration"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="ended_at" property="endedAt"/>
+        <result column="defect_type" property="defectType"/>
+        <result column="defect_description" property="defectDescription"/>
+        <result column="video_url" property="videoUrl"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">id, work_order_no, harness_code, moving_duration, harness_type, station_code, station_id, status, quality_result, task_ids, detection_duration, created_at, started_at, ended_at, defect_type, defect_description, video_url, image_url, updated_at</sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_work_order WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_work_order
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (work_order_no LIKE '%' || #{keyword} || '%' OR harness_code LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="statusIn != null and statusIn.size() > 0">
+                AND status IN
+                <foreach collection="statusIn" item="s" open="(" separator="," close=")">#{s}</foreach>
+            </if>
+            <if test="qualityResult != null and qualityResult != ''">
+                AND quality_result = #{qualityResult}
+            </if>
+            <if test="stationCode != null and stationCode != ''">
+                AND station_code = #{stationCode}
+            </if>
+            <if test="harnessType != null and harnessType != ''">
+                AND harness_type = #{harnessType}
+            </if>
+            <if test="dateFrom != null and dateFrom != ''">
+                AND created_at &gt;= (#{dateFrom}::date)
+            </if>
+            <if test="dateTo != null and dateTo != ''">
+                AND created_at &lt;= ((#{dateTo}::date) + interval '1 day')
+            </if>
+        </where>
+        <choose>
+            <when test="orderBy == 'startedAt_desc'">ORDER BY started_at DESC NULLS LAST, id DESC</when>
+            <otherwise>ORDER BY created_at DESC, id DESC</otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1) FROM qc_work_order
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (work_order_no LIKE '%' || #{keyword} || '%' OR harness_code LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="statusIn != null and statusIn.size() > 0">
+                AND status IN
+                <foreach collection="statusIn" item="s" open="(" separator="," close=")">#{s}</foreach>
+            </if>
+            <if test="qualityResult != null and qualityResult != ''">
+                AND quality_result = #{qualityResult}
+            </if>
+            <if test="stationCode != null and stationCode != ''">
+                AND station_code = #{stationCode}
+            </if>
+            <if test="harnessType != null and harnessType != ''">
+                AND harness_type = #{harnessType}
+            </if>
+            <if test="dateFrom != null and dateFrom != ''">
+                AND created_at &gt;= (#{dateFrom}::date)
+            </if>
+            <if test="dateTo != null and dateTo != ''">
+                AND created_at &lt;= ((#{dateTo}::date) + interval '1 day')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateById">
+        UPDATE qc_work_order
+        <set>
+            <if test="harnessType != null">harness_type = #{harnessType},</if>
+            <if test="qualityResult != null">quality_result = #{qualityResult},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="defectType != null">defect_type = #{defectType},</if>
+            <if test="defectDescription != null">defect_description = #{defectDescription},</if>
+            <if test="endedAt != null">ended_at = #{endedAt},</if>
+            <if test="startedAt != null">started_at = #{startedAt},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM qc_work_order WHERE id = #{id}
+    </delete>
+</mapper>

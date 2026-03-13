@@ -13,4 +13,5 @@ alwaysApply: true
 - **日志规范**：SLF4J，占位符，禁止 System.out；错误日志含关键参数与业务 ID。
 - **编码与格式**：UTF-8、4 空格、类成员顺序（常量→字段→构造→public→private）、单方法 < 80 行、字面量在前防 NPE、集合用泛型。
 - **数据库**：表名字段 snake_case，避免 SELECT *，列表分页，注意索引与缓存。
+- **ID 规范**：新开发模块中涉及 ID 的业务表优先使用 Snowflake 算法生成的 `bigint` 主键 ID（如通过 `SnowflakeIdGenerator`），`code` 字段仅作为业务编码/展示用，接口路径参数中的 `/{id}` 默认指向主键 ID，`code` 通过请求体或查询参数传递。
 - **质量**：参数校验（@Valid）、接口文档（Swagger）、单元测试与 Git 提交格式 type(scope): description。

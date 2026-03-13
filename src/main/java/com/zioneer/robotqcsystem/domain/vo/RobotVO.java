@@ -1,5 +1,7 @@
 package com.zioneer.robotqcsystem.domain.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +20,8 @@ import java.time.LocalDateTime;
 @Schema(description = "机器人信息")
 public class RobotVO {
 
-    @Schema(description = "主键")
+    @JsonSerialize(using = ToStringSerializer.class)
+    @Schema(description = "主键（Snowflake），JSON 序列化为字符串避免前端精度丢失")
     private Long id;
 
     @Schema(description = "机器人编码")

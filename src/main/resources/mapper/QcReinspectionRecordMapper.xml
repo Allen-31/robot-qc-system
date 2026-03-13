@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.QcReinspectionRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.QcReinspectionRecord">
+        <id column="id" property="id"/>
+        <result column="reinspection_no" property="reinspectionNo"/>
+        <result column="work_order_id" property="workOrderId"/>
+        <result column="quality_result" property="qualityResult"/>
+        <result column="status" property="status"/>
+        <result column="reinspection_result" property="reinspectionResult"/>
+        <result column="defect_type" property="defectType"/>
+        <result column="reinspection_time" property="reinspectionTime"/>
+        <result column="reviewer" property="reviewer"/>
+        <result column="video_url" property="videoUrl"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">id, reinspection_no, work_order_id, quality_result, status, reinspection_result, defect_type, reinspection_time, reviewer, video_url, image_url, created_at, updated_at</sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_reinspection_record WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT r.* FROM qc_reinspection_record r
+        LEFT JOIN qc_work_order w ON r.work_order_id = w.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (r.reinspection_no LIKE '%' || #{keyword} || '%' OR w.work_order_no LIKE '%' || #{keyword} || '%' OR w.harness_code LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND r.status = #{status}
+            </if>
+            <if test="reinspectionResult != null and reinspectionResult != ''">
+                AND r.reinspection_result = #{reinspectionResult}
+            </if>
+            <if test="dateFrom != null and dateFrom != ''">
+                AND r.reinspection_time &gt;= (#{dateFrom}::timestamp)
+            </if>
+            <if test="dateTo != null and dateTo != ''">
+                AND r.reinspection_time &lt;= ((#{dateTo}::date) + interval '1 day')
+            </if>
+        </where>
+        ORDER BY r.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1) FROM qc_reinspection_record r
+        LEFT JOIN qc_work_order w ON r.work_order_id = w.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (r.reinspection_no LIKE '%' || #{keyword} || '%' OR w.work_order_no LIKE '%' || #{keyword} || '%' OR w.harness_code LIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND r.status = #{status}
+            </if>
+            <if test="reinspectionResult != null and reinspectionResult != ''">
+                AND r.reinspection_result = #{reinspectionResult}
+            </if>
+            <if test="dateFrom != null and dateFrom != ''">
+                AND r.reinspection_time &gt;= (#{dateFrom}::timestamp)
+            </if>
+            <if test="dateTo != null and dateTo != ''">
+                AND r.reinspection_time &lt;= ((#{dateTo}::date) + interval '1 day')
+            </if>
+        </where>
+    </select>
+</mapper>

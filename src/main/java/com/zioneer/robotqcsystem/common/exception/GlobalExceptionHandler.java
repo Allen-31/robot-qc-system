@@ -3,10 +3,11 @@ package com.zioneer.robotqcsystem.common.exception;
 import com.zioneer.robotqcsystem.common.result.Result;
 import com.zioneer.robotqcsystem.common.result.ResultCode;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -76,11 +77,48 @@ public class GlobalExceptionHandler {
                 "缺少必要参数: " + e.getParameterName());
     }
 
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Result<Void> handleDuplicateKey(DuplicateKeyException e) {
+        String message = resolveDuplicateKeyMessage(e);
+        log.warn("唯一约束冲突: {}", message);
+        return Result.fail(ResultCode.BAD_REQUEST.getCode(), message);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
         log.error("系统异常", e);
         return Result.fail(ResultCode.INTERNAL_ERROR.getCode(),
                 "系统繁忙，请稍后重试");
+    }
+
+    /**
+     * 根据数据库唯一约束名返回友好提示，避免直接暴露 DuplicateKeyException。
+     */
+    private String resolveDuplicateKeyMessage(DuplicateKeyException e) {
+        String causeMessage = e.getCause() != null ? e.getCause().getMessage() : "";
+        if (causeMessage.contains("qc_terminal_code_key")) {
+            return "终端编码已存在";
+        }
+        if (causeMessage.contains("qc_terminal_sn_key")) {
+            return "终端序列号(SN)已存在";
+        }
+        if (causeMessage.contains("qc_station") && causeMessage.contains("code")) {
+            return "该工作站下工位编码已存在";
+        }
+        if (causeMessage.contains("qc_workstation") && causeMessage.contains("code")) {
+            return "工作站编码已存在";
+        }
+        if (causeMessage.contains("qc_wire_harness_type") && causeMessage.contains("code")) {
+            return "线束类型编码已存在";
+        }
+        if (causeMessage.contains("robot") && causeMessage.contains("code")) {
+            return "机器人编码已存在";
+        }
+        if (causeMessage.contains("device") && (causeMessage.contains("sn") || causeMessage.contains("code"))) {
+            return "设备序列号或编码已存在";
+        }
+        return "数据已存在，请勿重复提交";
     }
 }

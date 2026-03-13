@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.QcStationMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.QcStation">
+        <id column="id" property="id"/>
+        <result column="station_id" property="stationId"/>
+        <result column="workstation_id" property="workstationId"/>
+        <result column="name" property="name"/>
+        <result column="map_point" property="mapPoint"/>
+        <result column="status" property="status"/>
+        <result column="call_box_code" property="callBoxCode"/>
+        <result column="wire_harness_type" property="wireHarnessType"/>
+        <result column="detection_enabled" property="detectionEnabled"/>
+        <result column="enabled" property="enabled"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">id, station_id, workstation_id, name, map_point, status, call_box_code, wire_harness_type, detection_enabled, enabled, created_at, updated_at</sql>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_station
+        <where>
+            <if test="workstationId != null">
+                AND workstation_id = #{workstationId}
+            </if>
+        </where>
+        ORDER BY station_id ASC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_station WHERE id = #{id}
+    </select>
+
+    <select id="selectByWorkstationAndStationId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM qc_station
+        WHERE workstation_id = #{workstationId} AND station_id = #{stationId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO qc_station (id, station_id, workstation_id, name, map_point, status, call_box_code, wire_harness_type, detection_enabled, enabled, created_at, updated_at)
+        VALUES (#{id}, #{stationId}, #{workstationId}, #{name}, #{mapPoint}, #{status}, #{callBoxCode}, #{wireHarnessType}, #{detectionEnabled}, #{enabled}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById">
+        UPDATE qc_station
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="mapPoint != null">map_point = #{mapPoint},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="callBoxCode != null">call_box_code = #{callBoxCode},</if>
+            <if test="wireHarnessType != null">wire_harness_type = #{wireHarnessType},</if>
+            <if test="detectionEnabled != null">detection_enabled = #{detectionEnabled},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM qc_station WHERE id = #{id}
+    </delete>
+</mapper>
