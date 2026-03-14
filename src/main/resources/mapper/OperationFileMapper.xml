@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OperationFileMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationFile">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="size_bytes" property="sizeBytes"/>
+        <result column="tags" property="tags"/>
+        <result column="storage_path" property="storagePath"/>
+        <result column="preview_content" property="previewContent"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, type, size_bytes, tags, storage_path, preview_content, created_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_file
+        WHERE id = #{id}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_file
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND name ILIKE '%' || #{keyword} || '%'
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="tagList != null and tagList.size() > 0">
+                <foreach collection="tagList" item="tag" open=" AND (" separator=" OR " close=")">
+                    tags ILIKE '%' || #{tag} || '%'
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_file
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND name ILIKE '%' || #{keyword} || '%'
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="tagList != null and tagList.size() > 0">
+                <foreach collection="tagList" item="tag" open=" AND (" separator=" OR " close=")">
+                    tags ILIKE '%' || #{tag} || '%'
+                </foreach>
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO operation_file (id, name, type, size_bytes, tags, storage_path, preview_content, created_at)
+        VALUES (#{id}, #{name}, #{type}, #{sizeBytes}, #{tags}, #{storagePath}, #{previewContent}, #{createdAt})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM operation_file WHERE id = #{id}
+    </delete>
+</mapper>

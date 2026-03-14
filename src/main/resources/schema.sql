@@ -325,3 +325,17 @@ drop index if exists idx_robot_homing_strategy_group_no;
 create index idx_robot_homing_strategy_group_no on robot_homing_strategy(robot_group_no);
 drop index if exists idx_scene_device_map_code;
 create index idx_scene_device_map_code on scene_device(map_code);
+
+-- 运营-文件管理（4.4.1）
+create table if not exists operation_file (
+    id bigint primary key,
+    name varchar(255) not null,
+    type varchar(64) not null,
+    size_bytes bigint not null,
+    tags varchar(512) not null default '',
+    storage_path varchar(512) not null,
+    preview_content text,
+    created_at timestamp not null
+);
+create index if not exists idx_operation_file_type on operation_file(type);
+create index if not exists idx_operation_file_created_at on operation_file(created_at desc);

@@ -10,9 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Swagger / OpenAPI 文档配置
- * 启动后访问: http://localhost:8080/swagger-ui.html
- * 需认证接口可在页面顶部点击 Authorize 输入 Bearer &lt;token&gt;
+ * Swagger / OpenAPI configuration.
  */
 @Configuration
 public class SwaggerConfig {
@@ -23,8 +21,8 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("机器人质检管理系统 API")
-                        .description("Robot QC System 后台接口文档，支持在线调试。登录后可在 Authorize 中填写 Bearer &lt;token&gt; 调用需认证接口。")
+                        .title("Robot QC System API")
+                        .description("Backend APIs for Robot QC System.")
                         .version("0.0.1")
                         .contact(new Contact()
                                 .name("RobotQcSystem")
@@ -36,6 +34,6 @@ public class SwaggerConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                                        .description("登录后获得的 JWT，填写时只需填 token 部分")));
+                                        .description("Provide JWT access token.")));
     }
 }

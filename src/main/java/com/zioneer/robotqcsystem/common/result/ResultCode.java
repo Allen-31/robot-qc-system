@@ -4,19 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 统一响应码
+ * Unified result codes.
  */
 @Getter
 @AllArgsConstructor
 public enum ResultCode {
 
-    SUCCESS(200, "操作成功"),
-    BAD_REQUEST(400, "请求参数错误"),
-    UNAUTHORIZED(401, "未授权"),
-    FORBIDDEN(403, "无权限"),
-    NOT_FOUND(404, "资源不存在"),
-    INTERNAL_ERROR(500, "服务器内部错误"),
-    BUSINESS_ERROR(600, "业务异常");
+    SUCCESS(200, "Success"),
+    BAD_REQUEST(400, "Bad request"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    FORBIDDEN(403, "Forbidden"),
+    NOT_FOUND(404, "Not found"),
+    INTERNAL_ERROR(500, "Internal server error"),
+    BUSINESS_ERROR(600, "Business error");
 
     private final int code;
     private final String message;

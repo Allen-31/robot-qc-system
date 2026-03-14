@@ -60,6 +60,9 @@ Desktop.ini
 # ---- 数据库导出（含数据，不提交） ----
 docs/robot_qc_export.sql
 
+# ---- 运营文件上传目录（4.4.1） ----
+uploads/
+
 # ---- 临时/备份 ----
 *.bak
 *.swp

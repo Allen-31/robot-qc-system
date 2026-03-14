@@ -7,87 +7,87 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 新增机器人请求
+ * Create robot request.
  */
 @Data
-@Schema(description = "新增机器人请求")
+@Schema(description = "Create robot request")
 public class RobotCreateDTO {
 
-    @NotBlank(message = "机器人编码不能为空")
-    @Schema(description = "机器人编码", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "Robot code is required")
+    @Schema(description = "Robot code", requiredMode = Schema.RequiredMode.REQUIRED)
     private String robotCode;
 
-    @NotBlank(message = "机器人名称不能为空")
-    @Schema(description = "机器人名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "Robot name is required")
+    @Schema(description = "Robot name", requiredMode = Schema.RequiredMode.REQUIRED)
     private String robotName;
 
-    @Schema(description = "序列号")
+    @Schema(description = "Serial number")
     private String serialNo;
 
-    @Schema(description = "IP地址")
+    @Schema(description = "IP address")
     private String ip;
 
-    @Schema(description = "型号")
+    @Schema(description = "Model")
     private String model;
 
-    @Schema(description = "固件版本")
+    @Schema(description = "Firmware version")
     private String firmwareVersion;
 
-    @Schema(description = "机器人类型编号")
+    @Schema(description = "Robot type code")
     private String robotTypeNo;
 
-    @Schema(description = "机器人类型名称")
+    @Schema(description = "Robot type name")
     private String robotTypeName;
 
-    @Schema(description = "分组编号")
+    @Schema(description = "Group code")
     private String groupNo;
 
-    @Schema(description = "分组名称")
+    @Schema(description = "Group name")
     private String groupName;
 
-    @NotBlank(message = "状态不能为空")
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "Status is required")
+    @Schema(description = "Status", requiredMode = Schema.RequiredMode.REQUIRED)
     private String status;
 
-    @Schema(description = "在线状态")
+    @Schema(description = "Online status")
     private String onlineStatus;
 
-    @Schema(description = "电量（%）")
+    @Schema(description = "Battery (%)")
     private Integer battery;
 
-    @Schema(description = "里程（km）")
+    @Schema(description = "Mileage (km)")
     private Double mileageKm;
 
-    @Schema(description = "当前地图编码")
+    @Schema(description = "Current map code")
     private String currentMapCode;
 
-    @Schema(description = "当前地图名称")
+    @Schema(description = "Current map name")
     private String currentMapName;
 
-    @Schema(description = "调度模式")
+    @Schema(description = "Dispatch mode")
     private String dispatchMode;
 
-    @Schema(description = "控制状态")
+    @Schema(description = "Control status")
     private String controlStatus;
 
-    @Schema(description = "异常状态")
+    @Schema(description = "Exception status")
     private String exceptionStatus;
 
-    @Schema(description = "视频地址")
+    @Schema(description = "Video URL")
     private String videoUrl;
 
-    @Schema(description = "位置")
+    @Schema(description = "Location")
     private String location;
 
-    @Schema(description = "最近巡检时间")
+    @Schema(description = "Last inspection time")
     private LocalDateTime lastInspectionAt;
 
-    @Schema(description = "注册时间")
+    @Schema(description = "Registered time")
     private LocalDateTime registeredAt;
 
-    @Schema(description = "最近在线时间")
+    @Schema(description = "Last online time")
     private LocalDateTime lastOnlineAt;
 
-    @Schema(description = "最近心跳时间")
+    @Schema(description = "Last heartbeat time")
     private LocalDateTime lastHeartbeatAt;
 }
