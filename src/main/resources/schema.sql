@@ -326,6 +326,25 @@ create index idx_robot_homing_strategy_group_no on robot_homing_strategy(robot_g
 drop index if exists idx_scene_device_map_code;
 create index idx_scene_device_map_code on scene_device(map_code);
 
+-- 部署配置-设定-许可证管理
+create table if not exists deploy_license (
+    id bigint primary key,
+    name varchar(255) not null,
+    file_name varchar(255) not null,
+    storage_path varchar(512) not null,
+    size_bytes bigint not null,
+    md5 varchar(64),
+    effective_at timestamp,
+    expire_at timestamp,
+    applicant varchar(64),
+    status varchar(32) not null default 'active',
+    imported_at timestamp not null
+);
+create index if not exists idx_deploy_license_status on deploy_license(status);
+create index if not exists idx_deploy_license_imported_at on deploy_license(imported_at desc);
+create unique index if not exists uk_deploy_license_name on deploy_license(name);
+create unique index if not exists uk_deploy_license_md5 on deploy_license(md5) where md5 is not null;
+
 -- 运营-文件管理（4.4.1）
 create table if not exists operation_file (
     id bigint primary key,

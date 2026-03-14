@@ -241,3 +241,10 @@ WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6002);
 INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
 SELECT 6003, 'TK-20260304-003', 'MES-WO-778209', 'completed', 'RB-A101', 1, '总装一线离线补检任务', now(), now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6003);
+
+-- seed deploy licenses
+INSERT INTO deploy_license (id, name, file_name, storage_path, size_bytes, md5, effective_at, expire_at, applicant, status, imported_at)
+SELECT 7001, '产线基础许可证', 'factory-basic.lic', 'uploads/deploy-licenses/7001_factory-basic.lic', 2048,
+       'a8f5f167f44f4964e6c998dee827110c', now() - interval '7 day', now() + interval '358 day',
+       'admin', 'active', now()
+WHERE NOT EXISTS (SELECT 1 FROM deploy_license WHERE id = 7001);

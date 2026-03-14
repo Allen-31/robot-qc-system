@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.DeployLicenseMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.DeployLicense">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="file_name" property="fileName"/>
+        <result column="storage_path" property="storagePath"/>
+        <result column="size_bytes" property="sizeBytes"/>
+        <result column="md5" property="md5"/>
+        <result column="effective_at" property="effectiveAt"/>
+        <result column="expire_at" property="expireAt"/>
+        <result column="applicant" property="applicant"/>
+        <result column="status" property="status"/>
+        <result column="imported_at" property="importedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, file_name, storage_path, size_bytes, md5, effective_at, expire_at, applicant, status, imported_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_license
+        WHERE id = #{id}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM deploy_license
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%'
+                OR file_name ILIKE '%' || #{keyword} || '%'
+                OR applicant ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="expired != null and expired">
+                AND expire_at IS NOT NULL AND expire_at &lt; #{now}
+            </if>
+            <if test="excludeExpired != null and excludeExpired">
+                AND (expire_at IS NULL OR expire_at &gt;= #{now})
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_license
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%'
+                OR file_name ILIKE '%' || #{keyword} || '%'
+                OR applicant ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="expired != null and expired">
+                AND expire_at IS NOT NULL AND expire_at &lt; #{now}
+            </if>
+            <if test="excludeExpired != null and excludeExpired">
+                AND (expire_at IS NULL OR expire_at &gt;= #{now})
+            </if>
+        </where>
+        ORDER BY imported_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="existsByName" resultType="int">
+        SELECT COUNT(1)
+        FROM deploy_license
+        WHERE name = #{name}
+    </select>
+
+    <select id="existsByMd5" resultType="int">
+        SELECT COUNT(1)
+        FROM deploy_license
+        WHERE md5 = #{md5}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO deploy_license (id, name, file_name, storage_path, size_bytes, md5, effective_at, expire_at, applicant, status, imported_at)
+        VALUES (#{id}, #{name}, #{fileName}, #{storagePath}, #{sizeBytes}, #{md5}, #{effectiveAt}, #{expireAt}, #{applicant}, #{status}, #{importedAt})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM deploy_license WHERE id = #{id}
+    </delete>
+</mapper>
