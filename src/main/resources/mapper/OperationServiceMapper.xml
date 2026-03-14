@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OperationServiceMapper">
+
+    <resultMap id="ServiceResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationService">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="version" property="version"/>
+        <result column="ip" property="ip"/>
+        <result column="status" property="status"/>
+        <result column="cpu_usage" property="cpuUsage"/>
+        <result column="memory_usage" property="memoryUsage"/>
+        <result column="runtime" property="runtime"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <resultMap id="LogResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationServiceLog">
+        <id column="id" property="id"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="log_name" property="logName"/>
+        <result column="type" property="type"/>
+        <result column="content" property="content"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Service_Column_List">
+        id, name, type, version, ip, status, cpu_usage, memory_usage, runtime, created_at, updated_at
+    </sql>
+
+    <sql id="Log_Column_List">
+        id, service_id, log_name, type, content, created_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="ServiceResultMap">
+        SELECT <include refid="Service_Column_List"/>
+        FROM operation_service
+        WHERE id = #{id}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_service
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%' OR type ILIKE '%' || #{keyword} || '%'
+                    OR version ILIKE '%' || #{keyword} || '%' OR ip ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="version != null and version != ''">
+                AND version = #{version}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="ServiceResultMap">
+        SELECT <include refid="Service_Column_List"/>
+        FROM operation_service
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%' OR type ILIKE '%' || #{keyword} || '%'
+                    OR version ILIKE '%' || #{keyword} || '%' OR ip ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="version != null and version != ''">
+                AND version = #{version}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND ip = #{ip}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE operation_service
+        SET status = #{status}, updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectLogsByServiceIds" resultMap="LogResultMap">
+        SELECT id, service_id, log_name, type, content, created_at, updated_at
+        FROM (
+            SELECT id, service_id, log_name, type, content, created_at, updated_at,
+                   ROW_NUMBER() OVER (PARTITION BY service_id ORDER BY created_at DESC) rn
+            FROM operation_service_log
+            WHERE service_id IN
+            <foreach collection="serviceIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        ) t
+        WHERE rn &lt;= 5
+        ORDER BY service_id, created_at DESC
+    </select>
+
+    <select id="countLogs" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_service_log
+        <where>
+            service_id = #{serviceId}
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectLogList" resultMap="LogResultMap">
+        SELECT <include refid="Log_Column_List"/>
+        FROM operation_service_log
+        <where>
+            service_id = #{serviceId}
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insertLog">
+        INSERT INTO operation_service_log (id, service_id, log_name, type, content, created_at, updated_at)
+        VALUES (#{id}, #{serviceId}, #{logName}, #{type}, #{content}, #{createdAt}, #{updatedAt})
+    </insert>
+</mapper>

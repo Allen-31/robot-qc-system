@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OperationPublishMapper">
+
+    <resultMap id="PublishResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationPublish">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="package_name" property="packageName"/>
+        <result column="target_robots" property="targetRobots"
+                typeHandler="com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler"/>
+        <result column="target_robot_groups" property="targetRobotGroups"
+                typeHandler="com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler"/>
+        <result column="target_robot_types" property="targetRobotTypes"
+                typeHandler="com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler"/>
+        <result column="strategy" property="strategy"/>
+        <result column="restart_after_upgrade" property="restartAfterUpgrade"/>
+        <result column="status" property="status"/>
+        <result column="creator" property="creator"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="completed_at" property="completedAt"/>
+    </resultMap>
+
+    <resultMap id="DeviceResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationPublishDevice">
+        <id column="id" property="id"/>
+        <result column="publish_id" property="publishId"/>
+        <result column="device_name" property="deviceName"/>
+        <result column="ip" property="ip"/>
+        <result column="status" property="status"/>
+        <result column="package_name" property="packageName"/>
+        <result column="version" property="version"/>
+        <result column="progress" property="progress"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="completed_at" property="completedAt"/>
+    </resultMap>
+
+    <resultMap id="TargetRobotResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationPublishTargetRobot">
+        <result column="robot_code" property="robotCode"/>
+        <result column="ip" property="ip"/>
+    </resultMap>
+
+    <sql id="Publish_Column_List">
+        id, name, package_name, target_robots, target_robot_groups, target_robot_types,
+        strategy, restart_after_upgrade, status, creator, created_at, updated_at, completed_at
+    </sql>
+
+    <sql id="Device_Column_List">
+        id, publish_id, device_name, ip, status, package_name, version, progress, updated_at, completed_at
+    </sql>
+
+    <select id="selectById" resultMap="PublishResultMap">
+        SELECT <include refid="Publish_Column_List"/>
+        FROM operation_publish
+        WHERE id = #{id}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_publish
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%' OR package_name ILIKE '%' || #{keyword} || '%'
+                     OR creator ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="strategy != null and strategy != ''">
+                AND strategy = #{strategy}
+            </if>
+            <if test="packageName != null and packageName != ''">
+                AND package_name = #{packageName}
+            </if>
+            <if test="creator != null and creator != ''">
+                AND creator = #{creator}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="PublishResultMap">
+        SELECT <include refid="Publish_Column_List"/>
+        FROM operation_publish
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%' OR package_name ILIKE '%' || #{keyword} || '%'
+                     OR creator ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="strategy != null and strategy != ''">
+                AND strategy = #{strategy}
+            </if>
+            <if test="packageName != null and packageName != ''">
+                AND package_name = #{packageName}
+            </if>
+            <if test="creator != null and creator != ''">
+                AND creator = #{creator}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO operation_publish (
+            id, name, package_name, target_robots, target_robot_groups, target_robot_types,
+            strategy, restart_after_upgrade, status, creator, created_at, updated_at, completed_at
+        ) VALUES (
+            #{id}, #{name}, #{packageName},
+            #{targetRobots, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler},
+            #{targetRobotGroups, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler},
+            #{targetRobotTypes, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler},
+            #{strategy}, #{restartAfterUpgrade}, #{status}, #{creator}, #{createdAt}, #{updatedAt}, #{completedAt}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE operation_publish
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="packageName != null">package_name = #{packageName},</if>
+            <if test="targetRobots != null">
+                target_robots = #{targetRobots, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler},
+            </if>
+            <if test="targetRobotGroups != null">
+                target_robot_groups = #{targetRobotGroups, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler},
+            </if>
+            <if test="targetRobotTypes != null">
+                target_robot_types = #{targetRobotTypes, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonStringListTypeHandler},
+            </if>
+            <if test="strategy != null">strategy = #{strategy},</if>
+            <if test="restartAfterUpgrade != null">restart_after_upgrade = #{restartAfterUpgrade},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE operation_publish
+        SET status = #{status},
+            completed_at = #{completedAt},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertDevice">
+        INSERT INTO operation_publish_device (
+            id, publish_id, device_name, ip, status, package_name, version, progress, updated_at, completed_at
+        ) VALUES (
+            #{id}, #{publishId}, #{deviceName}, #{ip}, #{status}, #{packageName}, #{version},
+            #{progress}, #{updatedAt}, #{completedAt}
+        )
+    </insert>
+
+    <select id="selectDeviceById" resultMap="DeviceResultMap">
+        SELECT <include refid="Device_Column_List"/>
+        FROM operation_publish_device
+        WHERE id = #{id}
+    </select>
+
+    <select id="countDeviceList" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_publish_device
+        WHERE publish_id = #{publishId}
+    </select>
+
+    <select id="selectDeviceList" resultMap="DeviceResultMap">
+        SELECT <include refid="Device_Column_List"/>
+        FROM operation_publish_device
+        WHERE publish_id = #{publishId}
+        ORDER BY id ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="selectDevicesByPublishIds" resultMap="DeviceResultMap">
+        SELECT <include refid="Device_Column_List"/>
+        FROM operation_publish_device
+        WHERE publish_id IN
+        <foreach collection="publishIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY id ASC
+    </select>
+
+    <update id="updateDeviceStatus">
+        UPDATE operation_publish_device
+        SET status = #{status},
+            progress = #{progress},
+            updated_at = #{updatedAt},
+            completed_at = #{completedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="cancelDevicesByPublishId">
+        UPDATE operation_publish_device
+        SET status = 'cancelled',
+            updated_at = #{updatedAt}
+        WHERE publish_id = #{publishId}
+          AND status IN ('pending', 'upgrading')
+    </update>
+
+    <delete id="deleteDevicesByPublishId">
+        DELETE FROM operation_publish_device
+        WHERE publish_id = #{publishId}
+    </delete>
+
+    <select id="selectTargetRobots" resultMap="TargetRobotResultMap">
+        SELECT DISTINCT
+            r.robot_code,
+            to_jsonb(r) ->> 'ip' AS ip
+        FROM robot r
+        <where>
+            <trim prefixOverrides="OR">
+                <if test="robotCodes != null and robotCodes.size() > 0">
+                    OR r.robot_code IN
+                    <foreach collection="robotCodes" item="code" open="(" separator="," close=")">
+                        #{code}
+                    </foreach>
+                </if>
+                <if test="robotGroups != null and robotGroups.size() > 0">
+                    OR to_jsonb(r) ->> 'group_no' IN
+                    <foreach collection="robotGroups" item="group" open="(" separator="," close=")">
+                        #{group}
+                    </foreach>
+                </if>
+                <if test="robotTypes != null and robotTypes.size() > 0">
+                    OR to_jsonb(r) ->> 'robot_type_no' IN
+                    <foreach collection="robotTypes" item="type" open="(" separator="," close=")">
+                        #{type}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
+    </select>
+</mapper>

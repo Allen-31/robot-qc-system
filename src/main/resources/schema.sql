@@ -339,3 +339,101 @@ create table if not exists operation_file (
 );
 create index if not exists idx_operation_file_type on operation_file(type);
 create index if not exists idx_operation_file_created_at on operation_file(created_at desc);
+
+-- operation-service management
+create table if not exists operation_service (
+    id bigint primary key,
+    name varchar(128) not null,
+    type varchar(64) not null,
+    version varchar(64),
+    ip varchar(64),
+    status varchar(32) not null default 'running',
+    cpu_usage numeric(6,2),
+    memory_usage numeric(6,2),
+    runtime varchar(64),
+    created_at timestamp not null,
+    updated_at timestamp not null
+);
+create index if not exists idx_operation_service_type on operation_service(type);
+create index if not exists idx_operation_service_status on operation_service(status);
+
+create table if not exists operation_service_log (
+    id bigint primary key,
+    service_id bigint not null,
+    log_name varchar(255) not null,
+    type varchar(64),
+    content text,
+    created_at timestamp not null,
+    updated_at timestamp not null,
+    foreign key (service_id) references operation_service(id) on delete cascade
+);
+create index if not exists idx_operation_service_log_service on operation_service_log(service_id);
+create index if not exists idx_operation_service_log_created_at on operation_service_log(created_at desc);
+
+-- 运营-升级-安装包管理
+create table if not exists operation_package (
+    id bigint primary key,
+    name varchar(255) not null,
+    type varchar(64) not null,
+    target_parts jsonb not null default '[]',
+    description varchar(1024),
+    size_bytes bigint not null,
+    md5 varchar(64) not null,
+    uploader varchar(64),
+    uploaded_at timestamp not null,
+    storage_path varchar(512) not null
+);
+create index if not exists idx_operation_package_type on operation_package(type);
+create index if not exists idx_operation_package_md5 on operation_package(md5);
+create index if not exists idx_operation_package_uploaded_at on operation_package(uploaded_at desc);
+
+-- 运营-升级-发布管理
+create table if not exists operation_publish (
+    id bigint primary key,
+    name varchar(255) not null,
+    package_name varchar(255) not null,
+    target_robots jsonb not null default '[]',
+    target_robot_groups jsonb not null default '[]',
+    target_robot_types jsonb not null default '[]',
+    strategy varchar(32) not null,
+    restart_after_upgrade boolean not null default false,
+    status varchar(32) not null default 'pending',
+    creator varchar(64),
+    created_at timestamp not null,
+    updated_at timestamp not null,
+    completed_at timestamp
+);
+create index if not exists idx_operation_publish_status on operation_publish(status);
+create index if not exists idx_operation_publish_created_at on operation_publish(created_at desc);
+
+create table if not exists operation_publish_device (
+    id bigint primary key,
+    publish_id bigint not null,
+    device_name varchar(128) not null,
+    ip varchar(64),
+    status varchar(32) not null default 'pending',
+    package_name varchar(255) not null,
+    version varchar(64),
+    progress int not null default 0,
+    updated_at timestamp not null,
+    completed_at timestamp,
+    foreign key (publish_id) references operation_publish(id) on delete cascade
+);
+create index if not exists idx_operation_publish_device_publish on operation_publish_device(publish_id);
+
+-- 运营-任务-任务流管理
+create table if not exists operation_task (
+    id bigint primary key,
+    code varchar(64) not null unique,
+    external_code varchar(128),
+    status varchar(32) not null default 'pending',
+    robot_code varchar(64),
+    priority int not null default 1,
+    description varchar(512),
+    created_at timestamp not null,
+    ended_at timestamp,
+    updated_at timestamp not null
+);
+create index if not exists idx_operation_task_status on operation_task(status);
+create index if not exists idx_operation_task_robot_code on operation_task(robot_code);
+create index if not exists idx_operation_task_created_at on operation_task(created_at desc);

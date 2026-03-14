@@ -173,3 +173,71 @@ WHERE NOT EXISTS (SELECT 1 FROM robot_homing_strategy WHERE code = 'RHS-005');
 -- INSERT INTO robot (robot_code, robot_name, serial_no, ip, model, firmware_version, robot_type_no, robot_type_name, group_no, group_name, status, online_status, battery, mileage_km, current_map_code, current_map_name, dispatch_mode, control_status, exception_status, video_url, location, registered_at)\r\nSELECT 'RB-003', 'Robot-003', 'SN-003', '192.168.10.3', 'M3', '1.0', 'RT-003', 'Type-003', 'RG-003', 'Group-003', 'idle', 'offline', 60, 8.0, 'MAP-003', 'Map-003', 'manual', 'local', 'normal', NULL, 'A3', now()\r\nWHERE NOT EXISTS (SELECT 1 FROM robot WHERE robot_code = 'RB-003');
 -- INSERT INTO robot (robot_code, robot_name, serial_no, ip, model, firmware_version, robot_type_no, robot_type_name, group_no, group_name, status, online_status, battery, mileage_km, current_map_code, current_map_name, dispatch_mode, control_status, exception_status, video_url, location, registered_at)\r\nSELECT 'RB-004', 'Robot-004', 'SN-004', '192.168.10.4', 'M4', '1.0', 'RT-004', 'Type-004', 'RG-004', 'Group-004', 'idle', 'offline', 55, 6.0, 'MAP-004', 'Map-004', 'manual', 'local', 'normal', NULL, 'A4', now()\r\nWHERE NOT EXISTS (SELECT 1 FROM robot WHERE robot_code = 'RB-004');
 -- INSERT INTO robot (robot_code, robot_name, serial_no, ip, model, firmware_version, robot_type_no, robot_type_name, group_no, group_name, status, online_status, battery, mileage_km, current_map_code, current_map_name, dispatch_mode, control_status, exception_status, video_url, location, registered_at)\r\nSELECT 'RB-005', 'Robot-005', 'SN-005', '192.168.10.5', 'M5', '1.0', 'RT-005', 'Type-005', 'RG-005', 'Group-005', 'idle', 'online', 90, 15.0, 'MAP-005', 'Map-005', 'auto', 'remote', 'normal', NULL, 'A5', now()\r\nWHERE NOT EXISTS (SELECT 1 FROM robot WHERE robot_code = 'RB-005');
+
+-- seed operation services
+INSERT INTO operation_service (id, name, type, version, ip, status, cpu_usage, memory_usage, runtime, created_at, updated_at)
+SELECT 1001, 'Task Scheduler Service', 'business', 'v2.3.1', '10.10.2.11', 'running', 24.3, 61.5, '6d 12h', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service WHERE id = 1001);
+INSERT INTO operation_service (id, name, type, version, ip, status, cpu_usage, memory_usage, runtime, created_at, updated_at)
+SELECT 1002, 'Device Access Gateway', 'gateway', 'v1.9.4', '10.10.2.12', 'running', 32.7, 54.1, '13d 3h', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service WHERE id = 1002);
+INSERT INTO operation_service (id, name, type, version, ip, status, cpu_usage, memory_usage, runtime, created_at, updated_at)
+SELECT 1003, 'Quality Report Service', 'business', 'v3.0.0', '10.10.2.13', 'abnormal', 71.2, 83.9, '2d 7h', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service WHERE id = 1003);
+INSERT INTO operation_service (id, name, type, version, ip, status, cpu_usage, memory_usage, runtime, created_at, updated_at)
+SELECT 1004, 'File Storage Service', 'base', 'v1.4.8', '10.10.2.21', 'stopped', 0.0, 0.0, '0h', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service WHERE id = 1004);
+
+-- seed operation service logs
+INSERT INTO operation_service_log (id, service_id, log_name, type, content, created_at, updated_at)
+SELECT 2001, 1001, 'task-scheduler-20260304.log', 'runtime', '[INFO] Scheduler started\n[INFO] queueDepth=18', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service_log WHERE id = 2001);
+INSERT INTO operation_service_log (id, service_id, log_name, type, content, created_at, updated_at)
+SELECT 2002, 1002, 'device-gateway-20260304.log', 'runtime', '[INFO] Gateway online\n[INFO] activeConnections=112', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service_log WHERE id = 2002);
+INSERT INTO operation_service_log (id, service_id, log_name, type, content, created_at, updated_at)
+SELECT 2003, 1003, 'report-service-20260304.log', 'runtime', '[WARN] report queue backlog\n[ERROR] timeout', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_service_log WHERE id = 2003);
+
+-- seed operation packages
+INSERT INTO operation_package (id, name, type, target_parts, description, size_bytes, md5, uploader, uploaded_at, storage_path)
+SELECT 3001, 'cloud-release-20260304.zip', 'cloud',
+       '[{"part":"api-gateway","version":"v3.2.1"},{"part":"report-service","version":"v2.8.0"}]'::jsonb,
+       '云平台补丁包，修复调度拥堵问题并优化报表查询', 130636800, '9f8a2e7d40f11bc7e42a9d8228f8a0a4', 'admin', now(), 'uploads/operation-packages/3001_cloud-release-20260304.zip'
+WHERE NOT EXISTS (SELECT 1 FROM operation_package WHERE id = 3001);
+INSERT INTO operation_package (id, name, type, target_parts, description, size_bytes, md5, uploader, uploaded_at, storage_path)
+SELECT 3002, 'robot-rb-series-v5.1.0.zip', 'robot',
+       '[{"part":"motion-controller","version":"v5.1.0"},{"part":"camera-driver","version":"v2.4.6"},{"part":"arm-firmware","version":"v5.1.0"}]'::jsonb,
+       '机器人端升级包，提升稳定性和运动控制精度', 90439680, '34ea1cb9f06d45b689d2a6c1ed5f3b21', 'ops', now(), 'uploads/operation-packages/3002_robot-rb-series-v5.1.0.zip'
+WHERE NOT EXISTS (SELECT 1 FROM operation_package WHERE id = 3002);
+
+-- seed operation publish tasks
+INSERT INTO operation_publish (id, name, package_name, target_robots, target_robot_groups, target_robot_types, strategy, restart_after_upgrade, status, creator, created_at, updated_at, completed_at)
+SELECT 4001, '总装一线机器人夜间升级', 'robot-rb-series-v5.1.0.zip',
+       '["RB-A101","RB-A102"]'::jsonb, '["总装一线"]'::jsonb, '["AMR"]'::jsonb,
+       'idle', true, 'running', 'ops', now(), now(), NULL
+WHERE NOT EXISTS (SELECT 1 FROM operation_publish WHERE id = 4001);
+INSERT INTO operation_publish (id, name, package_name, target_robots, target_robot_groups, target_robot_types, strategy, restart_after_upgrade, status, creator, created_at, updated_at, completed_at)
+SELECT 4002, '云平台补丁全量发布', 'cloud-release-20260304.zip',
+       '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
+       'immediate', false, 'completed', 'admin', now(), now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_publish WHERE id = 4002);
+
+-- seed operation publish devices
+INSERT INTO operation_publish_device (id, publish_id, device_name, ip, status, package_name, version, progress, updated_at, completed_at)
+SELECT 5001, 4001, 'robot-rb-a101', '10.10.11.101', 'completed', 'robot-rb-series-v5.1.0.zip', 'v5.1.0', 100, now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_publish_device WHERE id = 5001);
+INSERT INTO operation_publish_device (id, publish_id, device_name, ip, status, package_name, version, progress, updated_at, completed_at)
+SELECT 5002, 4001, 'robot-rb-a102', '10.10.11.102', 'upgrading', 'robot-rb-series-v5.1.0.zip', 'v5.1.0', 65, now(), NULL
+WHERE NOT EXISTS (SELECT 1 FROM operation_publish_device WHERE id = 5002);
+
+-- seed operation tasks
+INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
+SELECT 6001, 'TK-20260304-001', 'MES-WO-778201', 'running', 'RB-A101', 1, '总装一线线束质检任务', now(), NULL, now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6001);
+INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
+SELECT 6002, 'TK-20260304-002', 'MES-WO-778205', 'paused', 'RB-A102', 2, '总装二线返修复检任务', now(), NULL, now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6002);
+INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
+SELECT 6003, 'TK-20260304-003', 'MES-WO-778209', 'completed', 'RB-A101', 1, '总装一线离线补检任务', now(), now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6003);

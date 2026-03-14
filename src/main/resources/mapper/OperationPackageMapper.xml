@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OperationPackageMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationPackage">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="target_parts" property="targetParts"
+                typeHandler="com.zioneer.robotqcsystem.mapper.typehandler.JsonPackagePartListTypeHandler"/>
+        <result column="description" property="description"/>
+        <result column="size_bytes" property="sizeBytes"/>
+        <result column="md5" property="md5"/>
+        <result column="uploader" property="uploader"/>
+        <result column="uploaded_at" property="uploadedAt"/>
+        <result column="storage_path" property="storagePath"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, type, target_parts, description, size_bytes, md5, uploader, uploaded_at, storage_path
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_package
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByMd5" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_package
+        WHERE md5 = #{md5}
+        LIMIT 1
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_package
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%' OR description ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="part != null and part != ''">
+                AND target_parts::text ILIKE '%' || #{part} || '%'
+            </if>
+            <if test="md5 != null and md5 != ''">
+                AND md5 = #{md5}
+            </if>
+            <if test="uploader != null and uploader != ''">
+                AND uploader = #{uploader}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_package
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%' OR description ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="part != null and part != ''">
+                AND target_parts::text ILIKE '%' || #{part} || '%'
+            </if>
+            <if test="md5 != null and md5 != ''">
+                AND md5 = #{md5}
+            </if>
+            <if test="uploader != null and uploader != ''">
+                AND uploader = #{uploader}
+            </if>
+        </where>
+        ORDER BY uploaded_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO operation_package (id, name, type, target_parts, description, size_bytes, md5, uploader, uploaded_at, storage_path)
+        VALUES (
+            #{id}, #{name}, #{type},
+            #{targetParts, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonPackagePartListTypeHandler},
+            #{description}, #{sizeBytes}, #{md5}, #{uploader}, #{uploadedAt}, #{storagePath}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE operation_package
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="targetParts != null">
+                target_parts = #{targetParts, typeHandler=com.zioneer.robotqcsystem.mapper.typehandler.JsonPackagePartListTypeHandler},
+            </if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sizeBytes != null">size_bytes = #{sizeBytes},</if>
+            <if test="md5 != null">md5 = #{md5},</if>
+            <if test="uploader != null">uploader = #{uploader},</if>
+            <if test="uploadedAt != null">uploaded_at = #{uploadedAt},</if>
+            <if test="storagePath != null">storage_path = #{storagePath},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM operation_package WHERE id = #{id}
+    </delete>
+</mapper>

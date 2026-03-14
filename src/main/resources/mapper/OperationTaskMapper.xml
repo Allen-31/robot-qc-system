@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OperationTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.OperationTask">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="external_code" property="externalCode"/>
+        <result column="status" property="status"/>
+        <result column="robot_code" property="robotCode"/>
+        <result column="priority" property="priority"/>
+        <result column="description" property="description"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="ended_at" property="endedAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_task
+        WHERE id = #{id}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_task
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code ILIKE '%' || #{keyword} || '%'
+                OR external_code ILIKE '%' || #{keyword} || '%'
+                OR description ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="robot != null and robot != ''">
+                AND robot_code = #{robot}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM operation_task
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code ILIKE '%' || #{keyword} || '%'
+                OR external_code ILIKE '%' || #{keyword} || '%'
+                OR description ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="robot != null and robot != ''">
+                AND robot_code = #{robot}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE operation_task
+        SET status = #{status},
+            updated_at = #{updatedAt},
+            ended_at = #{endedAt}
+        WHERE id = #{id}
+          AND status = #{expectedStatus}
+    </update>
+</mapper>

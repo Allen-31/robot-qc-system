@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.MappedTypes;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -14,9 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * List&lt;String&gt; 与 DB jsonb/varchar(JSON) 互转
+ * List&lt;String&gt; 与 DB jsonb/varchar(JSON) 互转。仅在 Mapper XML 中显式声明使用。
  */
-@MappedTypes(List.class)
 public class JsonStringListTypeHandler extends BaseTypeHandler<List<String>> {
 
     @Override
