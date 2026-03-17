@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OpsExceptionNotificationMapper">
+
+    <resultMap id="ExceptionNotificationResultMap" type="com.zioneer.robotqcsystem.domain.entity.OpsExceptionNotification">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="level" property="level"/>
+        <result column="type" property="type"/>
+        <result column="source_system" property="sourceSystem"/>
+        <result column="issue" property="issue"/>
+        <result column="status" property="status"/>
+        <result column="related_task" property="relatedTask"/>
+        <result column="robot_code" property="robotCode"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Exception_Column_List">
+        id, code, level, type, source_system, issue, status, related_task, robot_code, created_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="ExceptionNotificationResultMap">
+        SELECT <include refid="Exception_Column_List"/>
+        FROM ops_exception_notification
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByCode" resultMap="ExceptionNotificationResultMap">
+        SELECT <include refid="Exception_Column_List"/>
+        FROM ops_exception_notification
+        WHERE code = #{code}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM ops_exception_notification
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    code ILIKE '%' || #{keyword} || '%'
+                    OR type ILIKE '%' || #{keyword} || '%'
+                    OR source_system ILIKE '%' || #{keyword} || '%'
+                    OR issue ILIKE '%' || #{keyword} || '%'
+                    OR robot_code ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="level != null and level != ''">
+                AND level = #{level}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="ExceptionNotificationResultMap">
+        SELECT <include refid="Exception_Column_List"/>
+        FROM ops_exception_notification
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    code ILIKE '%' || #{keyword} || '%'
+                    OR type ILIKE '%' || #{keyword} || '%'
+                    OR source_system ILIKE '%' || #{keyword} || '%'
+                    OR issue ILIKE '%' || #{keyword} || '%'
+                    OR robot_code ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="level != null and level != ''">
+                AND level = #{level}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO ops_exception_notification (
+            id, code, level, type, source_system, issue, status, related_task, robot_code, created_at, updated_at
+        )
+        VALUES (
+            #{id}, #{code}, #{level}, #{type}, #{sourceSystem}, #{issue}, #{status}, #{relatedTask}, #{robotCode}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE ops_exception_notification
+        SET status = #{status}, updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

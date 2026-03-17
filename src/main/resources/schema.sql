@@ -17,10 +17,34 @@ create table if not exists robot (
     id bigint primary key,
     robot_code varchar(64) not null unique,
     robot_name varchar(128) not null,
+    serial_no varchar(128),
+    ip varchar(64),
     model varchar(128),
+    firmware_version varchar(128),
+    robot_type_no varchar(64),
+    robot_type_name varchar(128),
+    group_no varchar(64),
+    group_name varchar(128),
     status varchar(32) not null,
+    online_status varchar(32),
+    battery int,
+    mileage_km numeric(12,2),
+    current_map_code varchar(64),
+    current_map_name varchar(128),
+    dispatch_mode varchar(32),
+    control_status varchar(32),
+    exception_status varchar(32),
+    chassis_mode varchar(32),
+    arm_mode varchar(32),
+    is_charging boolean not null default false,
+    is_homing boolean not null default false,
+    is_lifted boolean not null default false,
+    video_url varchar(512),
     location varchar(128),
-    last_inspection_at timestamp
+    last_inspection_at timestamp,
+    registered_at timestamp,
+    last_online_at timestamp,
+    last_heartbeat_at timestamp
 );
 
 -- 用户与角色（登录、用户管理、角色权限）
@@ -491,3 +515,64 @@ create index if not exists idx_operation_task_robot_code on operation_task(robot
 create index if not exists idx_operation_task_created_at on operation_task(created_at desc);
 create index if not exists idx_operation_task_flow_template_code on operation_task(task_flow_template_code);
 create index if not exists idx_operation_task_template_code on operation_task(task_template_code);
+
+-- 运营-通知日志（异常通知/登录日志/操作日志/API 日志）
+create table if not exists ops_exception_notification (
+    id bigint primary key,
+    code varchar(64) not null unique,
+    level varchar(16) not null,
+    type varchar(128) not null,
+    source_system varchar(128),
+    issue varchar(1024),
+    status varchar(32) not null default 'pending',
+    related_task varchar(64),
+    robot_code varchar(64),
+    created_at timestamp not null,
+    updated_at timestamp not null
+);
+create index if not exists idx_op_exception_notification_level on ops_exception_notification(level);
+create index if not exists idx_op_exception_notification_status on ops_exception_notification(status);
+create index if not exists idx_op_exception_notification_created_at on ops_exception_notification(created_at desc);
+
+create table if not exists ops_login_log (
+    id bigint primary key,
+    log_code varchar(64) not null unique,
+    user_code varchar(64) not null,
+    type varchar(32) not null,
+    ip varchar(64),
+    created_at timestamp not null
+);
+create index if not exists idx_op_login_log_user on ops_login_log(user_code);
+create index if not exists idx_op_login_log_type on ops_login_log(type);
+create index if not exists idx_op_login_log_created_at on ops_login_log(created_at desc);
+
+create table if not exists ops_operation_log (
+    id bigint primary key,
+    log_code varchar(64) not null unique,
+    user_code varchar(64),
+    operation_type varchar(128),
+    result varchar(32) not null,
+    fail_reason varchar(512),
+    response_time int,
+    ip varchar(64),
+    request_info text,
+    response_info text,
+    created_at timestamp not null
+);
+create index if not exists idx_op_operation_log_user on ops_operation_log(user_code);
+create index if not exists idx_op_operation_log_result on ops_operation_log(result);
+create index if not exists idx_op_operation_log_created_at on ops_operation_log(created_at desc);
+
+create table if not exists ops_api_log (
+    id bigint primary key,
+    log_code varchar(64) not null unique,
+    api_name varchar(256),
+    call_result varchar(32) not null,
+    fail_reason varchar(512),
+    response_time int,
+    request_info text,
+    response_info text,
+    created_at timestamp not null
+);
+create index if not exists idx_op_api_log_result on ops_api_log(call_result);
+create index if not exists idx_op_api_log_created_at on ops_api_log(created_at desc);

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OpsOperationLogMapper">
+
+    <resultMap id="OperationLogResultMap" type="com.zioneer.robotqcsystem.domain.entity.OpsOperationLog">
+        <id column="id" property="id"/>
+        <result column="log_code" property="logCode"/>
+        <result column="user_code" property="userCode"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="result" property="result"/>
+        <result column="fail_reason" property="failReason"/>
+        <result column="response_time" property="responseTime"/>
+        <result column="ip" property="ip"/>
+        <result column="request_info" property="requestInfo"/>
+        <result column="response_info" property="responseInfo"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Operation_Log_Column_List">
+        id, log_code, user_code, operation_type, result, fail_reason, response_time, ip, request_info, response_info, created_at
+    </sql>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM ops_operation_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    user_code ILIKE '%' || #{keyword} || '%'
+                    OR operation_type ILIKE '%' || #{keyword} || '%'
+                    OR ip ILIKE '%' || #{keyword} || '%'
+                    OR request_info ILIKE '%' || #{keyword} || '%'
+                    OR response_info ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="result != null and result != ''">
+                AND result = #{result}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="OperationLogResultMap">
+        SELECT <include refid="Operation_Log_Column_List"/>
+        FROM ops_operation_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    user_code ILIKE '%' || #{keyword} || '%'
+                    OR operation_type ILIKE '%' || #{keyword} || '%'
+                    OR ip ILIKE '%' || #{keyword} || '%'
+                    OR request_info ILIKE '%' || #{keyword} || '%'
+                    OR response_info ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="result != null and result != ''">
+                AND result = #{result}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO ops_operation_log (
+            id, log_code, user_code, operation_type, result, fail_reason, response_time, ip, request_info, response_info, created_at
+        )
+        VALUES (
+            #{id}, #{logCode}, #{userCode}, #{operationType}, #{result}, #{failReason}, #{responseTime}, #{ip},
+            #{requestInfo}, #{responseInfo}, #{createdAt}
+        )
+    </insert>
+</mapper>

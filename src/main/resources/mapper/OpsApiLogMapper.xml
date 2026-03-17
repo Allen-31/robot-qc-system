@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OpsApiLogMapper">
+
+    <resultMap id="ApiLogResultMap" type="com.zioneer.robotqcsystem.domain.entity.OpsApiLog">
+        <id column="id" property="id"/>
+        <result column="log_code" property="logCode"/>
+        <result column="api_name" property="apiName"/>
+        <result column="call_result" property="callResult"/>
+        <result column="fail_reason" property="failReason"/>
+        <result column="response_time" property="responseTime"/>
+        <result column="request_info" property="requestInfo"/>
+        <result column="response_info" property="responseInfo"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Api_Log_Column_List">
+        id, log_code, api_name, call_result, fail_reason, response_time, request_info, response_info, created_at
+    </sql>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM ops_api_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    api_name ILIKE '%' || #{keyword} || '%'
+                    OR call_result ILIKE '%' || #{keyword} || '%'
+                    OR request_info ILIKE '%' || #{keyword} || '%'
+                    OR response_info ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="callResult != null and callResult != ''">
+                AND call_result = #{callResult}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="ApiLogResultMap">
+        SELECT <include refid="Api_Log_Column_List"/>
+        FROM ops_api_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    api_name ILIKE '%' || #{keyword} || '%'
+                    OR call_result ILIKE '%' || #{keyword} || '%'
+                    OR request_info ILIKE '%' || #{keyword} || '%'
+                    OR response_info ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="callResult != null and callResult != ''">
+                AND call_result = #{callResult}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO ops_api_log (
+            id, log_code, api_name, call_result, fail_reason, response_time, request_info, response_info, created_at
+        )
+        VALUES (
+            #{id}, #{logCode}, #{apiName}, #{callResult}, #{failReason}, #{responseTime}, #{requestInfo}, #{responseInfo}, #{createdAt}
+        )
+    </insert>
+</mapper>
