@@ -81,6 +81,21 @@ public class RobotVO {
     @Schema(description = "异常状态")
     private String exceptionStatus;
 
+    @Schema(description = "底盘模式")
+    private String chassisMode;
+
+    @Schema(description = "机械臂模式")
+    private String armMode;
+
+    @Schema(description = "是否充电中")
+    private Boolean isCharging;
+
+    @Schema(description = "是否归巢中")
+    private Boolean isHoming;
+
+    @Schema(description = "是否抬升中")
+    private Boolean isLifted;
+
     @Schema(description = "视频地址")
     private String videoUrl;
 

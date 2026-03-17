@@ -6,6 +6,7 @@ import com.zioneer.robotqcsystem.domain.dto.LoginRequest;
 import com.zioneer.robotqcsystem.domain.vo.LoginResponse;
 import com.zioneer.robotqcsystem.integration.keycloak.KeycloakAdminClient;
 import com.zioneer.robotqcsystem.service.auth.KeycloakLoginService;
+import com.zioneer.robotqcsystem.service.ops.OpsLoginLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ public class KeycloakLoginServiceImpl implements KeycloakLoginService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final KeycloakAdminClient keycloakAdmin;
+    private final OpsLoginLogService loginLogService;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuerUri;
@@ -72,10 +76,12 @@ public class KeycloakLoginServiceImpl implements KeycloakLoginService {
             );
             Map<String, Object> tokenResponse = response.getBody();
             if (tokenResponse == null || !tokenResponse.containsKey("access_token")) {
+                recordLogin(request.getUsername(), "failed");
                 throw new BadCredentialsException("用户名或密码错误");
             }
             String accessToken = (String) tokenResponse.get("access_token");
             LoginResponse.UserInfoVO userInfo = parseUserInfoFromToken(accessToken);
+            recordLogin(request.getUsername(), "login");
             return LoginResponse.builder()
                     .token(accessToken)
                     .user(userInfo)
@@ -84,6 +90,7 @@ public class KeycloakLoginServiceImpl implements KeycloakLoginService {
             String errorBody = e.getResponseBodyAsString();
             log.warn("Keycloak 登录失败 username=[{}] status=[{}] body=[{}]",
                     request.getUsername(), e.getStatusCode(), errorBody != null ? errorBody : "");
+            recordLogin(request.getUsername(), "failed");
             if (e.getStatusCode().value() == 404 && errorBody != null && errorBody.contains("Realm does not exist")) {
                 throw new BadCredentialsException("Keycloak Realm 未初始化，请先执行 scripts/keycloak-setup.ps1");
             }
@@ -106,6 +113,7 @@ public class KeycloakLoginServiceImpl implements KeycloakLoginService {
                         if (retryBody != null && retryBody.containsKey("access_token")) {
                             String accessToken = (String) retryBody.get("access_token");
                             LoginResponse.UserInfoVO userInfo = parseUserInfoFromToken(accessToken);
+                            recordLogin(request.getUsername(), "login");
                             return LoginResponse.builder().token(accessToken).user(userInfo).build();
                         }
                         throw new BadCredentialsException("账户未完全设置，已自动修复，请重新登录");
@@ -122,6 +130,7 @@ public class KeycloakLoginServiceImpl implements KeycloakLoginService {
             throw new BadCredentialsException("用户名或密码错误");
         } catch (ResourceAccessException e) {
             log.warn("无法连接 Keycloak，请确认已启动: {}", e.getMessage());
+            recordLogin(request.getUsername(), "failed");
             throw new BadCredentialsException("认证服务暂时不可用，请确认 Keycloak 已启动（默认端口 8081）");
         }
     }
@@ -168,5 +177,22 @@ public class KeycloakLoginServiceImpl implements KeycloakLoginService {
                 .displayName("unknown")
                 .roles(Collections.emptyList())
                 .build();
+    }
+
+    private void recordLogin(String username, String type) {
+        try {
+            String ip = getClientIp();
+            loginLogService.record(username, type, ip);
+        } catch (Exception ex) {
+            log.warn("record login log failed: {}", ex.getMessage());
+        }
+    }
+
+    private String getClientIp() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getRequest().getRemoteAddr();
     }
 }

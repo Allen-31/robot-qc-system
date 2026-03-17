@@ -39,6 +39,11 @@ public class Robot implements Serializable {
     private String dispatchMode;
     private String controlStatus;
     private String exceptionStatus;
+    private String chassisMode;
+    private String armMode;
+    private Boolean isCharging;
+    private Boolean isHoming;
+    private Boolean isLifted;
     private String videoUrl;
     private String location;
     private LocalDateTime lastInspectionAt;

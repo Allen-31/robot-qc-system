@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.OpsLoginLogMapper">
+
+    <resultMap id="LoginLogResultMap" type="com.zioneer.robotqcsystem.domain.entity.OpsLoginLog">
+        <id column="id" property="id"/>
+        <result column="log_code" property="logCode"/>
+        <result column="user_code" property="userCode"/>
+        <result column="type" property="type"/>
+        <result column="ip" property="ip"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Login_Log_Column_List">
+        id, log_code, user_code, type, ip, created_at
+    </sql>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM ops_login_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    user_code ILIKE '%' || #{keyword} || '%'
+                    OR type ILIKE '%' || #{keyword} || '%'
+                    OR ip ILIKE '%' || #{keyword} || '%'
+                    OR to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="LoginLogResultMap">
+        SELECT <include refid="Login_Log_Column_List"/>
+        FROM ops_login_log
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    user_code ILIKE '%' || #{keyword} || '%'
+                    OR type ILIKE '%' || #{keyword} || '%'
+                    OR ip ILIKE '%' || #{keyword} || '%'
+                    OR to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') ILIKE '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO ops_login_log (id, log_code, user_code, type, ip, created_at)
+        VALUES (#{id}, #{logCode}, #{userCode}, #{type}, #{ip}, #{createdAt})
+    </insert>
+</mapper>

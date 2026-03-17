@@ -2,6 +2,8 @@ package com.zioneer.robotqcsystem.common.logging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zioneer.robotqcsystem.service.ops.OpsApiLogService;
+import com.zioneer.robotqcsystem.service.ops.OpsOperationLogService;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -31,17 +35,21 @@ import java.util.Map;
 public class ApiLogAspect {
 
     private final ObjectMapper objectMapper;
+    private final OpsApiLogService apiLogService;
+    private final OpsOperationLogService operationLogService;
 
     @Around("within(@org.springframework.web.bind.annotation.RestController *)")
     public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
         String method = "";
         String uri = "";
+        String ip = null;
         ServletRequestAttributes attributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();
             method = request.getMethod();
             uri = request.getRequestURI();
+            ip = request.getRemoteAddr();
         }
 
         List<Object> args = new ArrayList<>();
@@ -69,13 +77,49 @@ public class ApiLogAspect {
             Object result = joinPoint.proceed();
             long cost = System.currentTimeMillis() - start;
             log.info("API {} {} done costMs={}", method, uri, cost);
+            recordLogs(method, uri, ip, argsJson, toJsonSafe(result), cost, null);
             return result;
         } catch (Throwable ex) {
             long cost = System.currentTimeMillis() - start;
             log.error("API {} {} failed costMs={} err={}",
                     method, uri, cost, ex.getMessage(), ex);
+            recordLogs(method, uri, ip, argsJson, ex.getMessage(), cost, ex.getMessage());
             throw ex;
         }
+    }
+
+    private void recordLogs(String method,
+                            String uri,
+                            String ip,
+                            String argsJson,
+                            String responseInfo,
+                            long costMs,
+                            String failReason) {
+        String apiName = method + " " + uri;
+        String result = failReason == null ? "success" : "failed";
+        String requestInfo = apiName + " " + argsJson;
+        try {
+            apiLogService.record(apiName, result, failReason, (int) costMs, requestInfo, responseInfo);
+        } catch (Exception ex) {
+            log.warn("API log persist failed: {}", ex.getMessage());
+        }
+        if (uri != null && uri.startsWith("/api/ops/robots") && !"GET".equalsIgnoreCase(method)) {
+            try {
+                String user = getCurrentUser();
+                operationLogService.record(user, apiName, result, failReason, (int) costMs, ip, requestInfo, responseInfo);
+            } catch (Exception ex) {
+                log.warn("Operation log persist failed: {}", ex.getMessage());
+            }
+        }
+    }
+
+    private String getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "anonymous";
+        }
+        String name = authentication.getName();
+        return name != null ? name : "anonymous";
     }
 
     private Object maskSensitive(Object arg) {
