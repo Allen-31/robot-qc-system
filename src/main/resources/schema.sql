@@ -345,6 +345,33 @@ create index if not exists idx_deploy_license_imported_at on deploy_license(impo
 create unique index if not exists uk_deploy_license_name on deploy_license(name);
 create unique index if not exists uk_deploy_license_md5 on deploy_license(md5) where md5 is not null;
 
+-- 部署配置-任务-任务流模板
+create table if not exists deploy_task_flow_template (
+    code varchar(64) primary key,
+    name varchar(128) not null,
+    enabled boolean not null default true,
+    priority int not null default 1,
+    created_by varchar(64),
+    created_at timestamp not null,
+    updated_by varchar(64),
+    updated_at timestamp not null
+);
+create index if not exists idx_deploy_task_flow_template_enabled on deploy_task_flow_template(enabled);
+create index if not exists idx_deploy_task_flow_template_priority on deploy_task_flow_template(priority);
+
+-- 部署配置-任务-任务模板
+create table if not exists deploy_task_template (
+    code varchar(64) primary key,
+    name varchar(128) not null,
+    enabled boolean not null default true,
+    created_by varchar(64),
+    created_at timestamp not null,
+    updated_by varchar(64),
+    updated_at timestamp not null
+);
+create index if not exists idx_deploy_task_template_enabled on deploy_task_template(enabled);
+create index if not exists idx_deploy_task_template_created_at on deploy_task_template(created_at desc);
+
 -- 运营-文件管理（4.4.1）
 create table if not exists operation_file (
     id bigint primary key,
@@ -445,6 +472,8 @@ create table if not exists operation_task (
     id bigint primary key,
     code varchar(64) not null unique,
     external_code varchar(128),
+    task_flow_template_code varchar(64),
+    task_template_code varchar(64),
     status varchar(32) not null default 'pending',
     robot_code varchar(64),
     priority int not null default 1,
@@ -453,6 +482,12 @@ create table if not exists operation_task (
     ended_at timestamp,
     updated_at timestamp not null
 );
+alter table operation_task
+    add column if not exists task_flow_template_code varchar(64);
+alter table operation_task
+    add column if not exists task_template_code varchar(64);
 create index if not exists idx_operation_task_status on operation_task(status);
 create index if not exists idx_operation_task_robot_code on operation_task(robot_code);
 create index if not exists idx_operation_task_created_at on operation_task(created_at desc);
+create index if not exists idx_operation_task_flow_template_code on operation_task(task_flow_template_code);
+create index if not exists idx_operation_task_template_code on operation_task(task_template_code);

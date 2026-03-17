@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zioneer.robotqcsystem.mapper.DeployTaskFlowTemplateMapper">
+
+    <resultMap id="BaseResultMap" type="com.zioneer.robotqcsystem.domain.entity.DeployTaskFlowTemplate">
+        <id column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="enabled" property="enabled"/>
+        <result column="priority" property="priority"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedBy"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        code, name, enabled, priority, created_by, created_at, updated_by, updated_at
+    </sql>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_task_flow_template
+        WHERE code = #{code}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM deploy_task_flow_template
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code ILIKE '%' || #{keyword} || '%'
+                OR name ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="enabled != null">
+                AND enabled = #{enabled}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM deploy_task_flow_template
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (code ILIKE '%' || #{keyword} || '%'
+                OR name ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="enabled != null">
+                AND enabled = #{enabled}
+            </if>
+        </where>
+        ORDER BY priority ASC, created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO deploy_task_flow_template (code, name, enabled, priority, created_by, created_at, updated_by, updated_at)
+        VALUES (#{code}, #{name}, #{enabled}, #{priority}, #{createdBy}, #{createdAt}, #{updatedBy}, #{updatedAt})
+    </insert>
+
+    <update id="updateByCode">
+        UPDATE deploy_task_flow_template
+        SET name = #{name},
+            enabled = #{enabled},
+            priority = #{priority},
+            updated_by = #{updatedBy},
+            updated_at = #{updatedAt}
+        WHERE code = #{code}
+    </update>
+
+    <delete id="deleteByCode">
+        DELETE FROM deploy_task_flow_template WHERE code = #{code}
+    </delete>
+
+    <select id="countTaskReferences" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_task
+        WHERE task_flow_template_code = #{code}
+    </select>
+</mapper>

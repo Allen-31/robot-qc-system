@@ -1,11 +1,11 @@
--- 初始角色与管理员（仅当表为空时插入，避免重复执行报错
--- 管理员默认密 admin123
+-- seed base data (UTF-8 without BOM)
+-- default admin password in data.sql is hashed (plain text was admin123)
 INSERT INTO sys_role (code, name, description, created_at, updated_at)
-SELECT 'admin', '超级管理员', '系统默认超级管理员角色', now(), now()
+SELECT 'admin', 'Super Admin', 'System default super admin role', now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'admin');
 
 INSERT INTO sys_user (code, name, phone, email, password_hash, status, created_at, updated_at)
-SELECT 'admin', '管理员', NULL, NULL,
+SELECT 'admin', 'Admin', NULL, NULL,
        '$2a$10$zkcsuiF5pOTjIT4lb9lkoe8QQ5KykQ1eyu4VAhSul7gLDhT2zJhrO',
        'enabled', now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM sys_user WHERE code = 'admin');
@@ -203,22 +203,22 @@ WHERE NOT EXISTS (SELECT 1 FROM operation_service_log WHERE id = 2003);
 INSERT INTO operation_package (id, name, type, target_parts, description, size_bytes, md5, uploader, uploaded_at, storage_path)
 SELECT 3001, 'cloud-release-20260304.zip', 'cloud',
        '[{"part":"api-gateway","version":"v3.2.1"},{"part":"report-service","version":"v2.8.0"}]'::jsonb,
-       '云平台补丁包，修复调度拥堵问题并优化报表查询', 130636800, '9f8a2e7d40f11bc7e42a9d8228f8a0a4', 'admin', now(), 'uploads/operation-packages/3001_cloud-release-20260304.zip'
+       'Cloud patch package', 130636800, '9f8a2e7d40f11bc7e42a9d8228f8a0a4', 'admin', now(), 'uploads/operation-packages/3001_cloud-release-20260304.zip'
 WHERE NOT EXISTS (SELECT 1 FROM operation_package WHERE id = 3001);
 INSERT INTO operation_package (id, name, type, target_parts, description, size_bytes, md5, uploader, uploaded_at, storage_path)
 SELECT 3002, 'robot-rb-series-v5.1.0.zip', 'robot',
        '[{"part":"motion-controller","version":"v5.1.0"},{"part":"camera-driver","version":"v2.4.6"},{"part":"arm-firmware","version":"v5.1.0"}]'::jsonb,
-       '机器人端升级包，提升稳定性和运动控制精度', 90439680, '34ea1cb9f06d45b689d2a6c1ed5f3b21', 'ops', now(), 'uploads/operation-packages/3002_robot-rb-series-v5.1.0.zip'
+       'Robot upgrade package', 90439680, '34ea1cb9f06d45b689d2a6c1ed5f3b21', 'ops', now(), 'uploads/operation-packages/3002_robot-rb-series-v5.1.0.zip'
 WHERE NOT EXISTS (SELECT 1 FROM operation_package WHERE id = 3002);
 
 -- seed operation publish tasks
 INSERT INTO operation_publish (id, name, package_name, target_robots, target_robot_groups, target_robot_types, strategy, restart_after_upgrade, status, creator, created_at, updated_at, completed_at)
-SELECT 4001, '总装一线机器人夜间升级', 'robot-rb-series-v5.1.0.zip',
-       '["RB-A101","RB-A102"]'::jsonb, '["总装一线"]'::jsonb, '["AMR"]'::jsonb,
+SELECT 4001, 'Assembly Line 1 Night Upgrade', 'robot-rb-series-v5.1.0.zip',
+       '["RB-A101","RB-A102"]'::jsonb, '["Line-1"]'::jsonb, '["AMR"]'::jsonb,
        'idle', true, 'running', 'ops', now(), now(), NULL
 WHERE NOT EXISTS (SELECT 1 FROM operation_publish WHERE id = 4001);
 INSERT INTO operation_publish (id, name, package_name, target_robots, target_robot_groups, target_robot_types, strategy, restart_after_upgrade, status, creator, created_at, updated_at, completed_at)
-SELECT 4002, '云平台补丁全量发布', 'cloud-release-20260304.zip',
+SELECT 4002, 'Cloud Patch Full Release', 'cloud-release-20260304.zip',
        '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
        'immediate', false, 'completed', 'admin', now(), now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM operation_publish WHERE id = 4002);
@@ -233,18 +233,33 @@ WHERE NOT EXISTS (SELECT 1 FROM operation_publish_device WHERE id = 5002);
 
 -- seed operation tasks
 INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
-SELECT 6001, 'TK-20260304-001', 'MES-WO-778201', 'running', 'RB-A101', 1, '总装一线线束质检任务', now(), NULL, now()
+SELECT 6001, 'TK-20260304-001', 'MES-WO-778201', 'running', 'RB-A101', 1, 'Assembly line 1 inspection task', now(), NULL, now()
 WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6001);
 INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
-SELECT 6002, 'TK-20260304-002', 'MES-WO-778205', 'paused', 'RB-A102', 2, '总装二线返修复检任务', now(), NULL, now()
+SELECT 6002, 'TK-20260304-002', 'MES-WO-778205', 'paused', 'RB-A102', 2, 'Assembly line 2 reinspection task', now(), NULL, now()
 WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6002);
 INSERT INTO operation_task (id, code, external_code, status, robot_code, priority, description, created_at, ended_at, updated_at)
-SELECT 6003, 'TK-20260304-003', 'MES-WO-778209', 'completed', 'RB-A101', 1, '总装一线离线补检任务', now(), now(), now()
+SELECT 6003, 'TK-20260304-003', 'MES-WO-778209', 'completed', 'RB-A101', 1, 'Assembly line 1 rework task', now(), now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM operation_task WHERE id = 6003);
 
 -- seed deploy licenses
 INSERT INTO deploy_license (id, name, file_name, storage_path, size_bytes, md5, effective_at, expire_at, applicant, status, imported_at)
-SELECT 7001, '产线基础许可证', 'factory-basic.lic', 'uploads/deploy-licenses/7001_factory-basic.lic', 2048,
+SELECT 7001, 'Factory Basic License', 'factory-basic.lic', 'uploads/deploy-licenses/7001_factory-basic.lic', 2048,
        'a8f5f167f44f4964e6c998dee827110c', now() - interval '7 day', now() + interval '358 day',
        'admin', 'active', now()
 WHERE NOT EXISTS (SELECT 1 FROM deploy_license WHERE id = 7001);
+-- seed deploy task flow templates
+INSERT INTO deploy_task_flow_template (code, name, enabled, priority, created_by, created_at, updated_by, updated_at)
+SELECT 'TASK-T01', 'Inspection Task Flow Template', true, 1, 'admin', now(), 'admin', now()
+WHERE NOT EXISTS (SELECT 1 FROM deploy_task_flow_template WHERE code = 'TASK-T01');
+INSERT INTO deploy_task_flow_template (code, name, enabled, priority, created_by, created_at, updated_by, updated_at)
+SELECT 'TASK-T02', 'Handling Task Flow Template', false, 2, 'operator', now(), 'operator', now()
+WHERE NOT EXISTS (SELECT 1 FROM deploy_task_flow_template WHERE code = 'TASK-T02');
+
+-- seed deploy task templates
+INSERT INTO deploy_task_template (code, name, enabled, created_by, created_at, updated_by, updated_at)
+SELECT 'TASK-A01', 'Inspection Task Template', true, 'admin', now(), 'admin', now()
+WHERE NOT EXISTS (SELECT 1 FROM deploy_task_template WHERE code = 'TASK-A01');
+INSERT INTO deploy_task_template (code, name, enabled, created_by, created_at, updated_by, updated_at)
+SELECT 'TASK-A02', 'Charging Task Template', true, 'admin', now(), 'admin', now()
+WHERE NOT EXISTS (SELECT 1 FROM deploy_task_template WHERE code = 'TASK-A02');
