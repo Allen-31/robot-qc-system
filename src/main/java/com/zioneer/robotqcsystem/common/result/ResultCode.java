@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Unified result codes.
+ * Unified result status values.
  */
 @Getter
 @AllArgsConstructor
 public enum ResultCode {
 
-    SUCCESS(200, "Success"),
+    SUCCESS(0, "Success"),
     BAD_REQUEST(400, "Bad request"),
     UNAUTHORIZED(401, "Unauthorized"),
     FORBIDDEN(403, "Forbidden"),
